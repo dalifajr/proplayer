@@ -158,10 +158,13 @@
       </div>
 
       <div class="card">
-        <h2 class="card-title">&#128202; Progress</h2>
-        <p id="a-step" class="text-sm font-bold" style="color:var(--md-on-surface)">Ready</p>
-        <div class="progress-track mt-2"><div id="a-bar" class="progress-bar" style="width:0%"></div></div>
-        <p id="a-sub" class="text-xs mt-1.5" style="color:var(--md-outline)"></p>
+        <h2 class="card-title">&#128202; Pipeline Progress</h2>
+        <p id="a-step" class="text-sm font-bold mb-3" style="color:var(--md-on-surface)">Ready to start</p>
+        <!-- 10-step horizontal stepper -->
+        <div class="stepper-track" id="stepper"></div>
+        <!-- hidden legacy bar kept for progress-width logic -->
+        <div class="progress-track mt-1 hidden"><div id="a-bar" class="progress-bar" style="width:0%"></div></div>
+        <p id="a-sub" class="text-xs mt-2" style="color:var(--md-outline)"></p>
       </div>
 
       <div class="card">
@@ -195,6 +198,11 @@
           <div class="info-row"><span class="info-k">Type</span><span id="a-mon-type" class="info-v">&#8212;</span></div>
           <div class="info-row"><span class="info-k">Approved</span><span id="a-mon-approved" class="info-v">&#8212;</span></div>
           <div class="info-row"><span class="info-k">Expires</span><span id="a-mon-expires" class="info-v">&#8212;</span></div>
+        </div>
+        <!-- Mini status history chart -->
+        <div class="mt-2">
+          <p class="text-xs mb-1.5" style="color:var(--md-outline);">Status history (newest &#8592; oldest)</p>
+          <div id="a-mon-history" class="flex gap-1.5 flex-wrap"></div>
         </div>
         <button onclick="stopMonitor()" class="btn btn-ghost text-sm mt-1">&#9646;&#9646; Stop Monitor</button>
       </div>
@@ -496,8 +504,8 @@
     </div>
   </div>
 
-  <!-- ══ Toast (M3 Snackbar) ══ -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] px-6 py-3 text-sm font-medium shadow-xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none" style="border-radius:16px; background:var(--md-inverse-surface); color:var(--md-inverse-on-surface);"></div>
+  <!-- ══ Toast Container (M3 Snackbar — bottom-right stacked) ══ -->
+  <div id="toast-container"></div>
 
   <script src="app.js"></script>
 </body>

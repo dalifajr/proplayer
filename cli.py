@@ -22,6 +22,10 @@ os.chdir(BASE)
 import core
 from i18n import t, set_language, get_language
 
+# ── App metadata ──────────────────────────────────────────────────────
+APP_VERSION = "2.0"
+BUILD_DATE  = "2026-03-03"
+
 # ── Rich integration (optional) ───────────────────────────────────────────
 try:
     from rich.console import Console
@@ -170,7 +174,8 @@ def banner():
             text.append(line, style="bold cyan")
             if i < len(art_lines) - 1:
                 text.append("\n")
-        text.append("\n\n[dim]Full-Auto CLI  │  by Dzul[/dim]")
+        text.append(f"\n\n[dim]Full-Auto CLI  │  by Dzul[/dim]")
+        text.append(f"\n[dim]v{APP_VERSION}  ·  {BUILD_DATE}[/dim]")
         console.print()
         console.print(Panel(text, border_style="blue", box=box.DOUBLE))
         console.print()
@@ -197,6 +202,9 @@ def banner():
     sub = "Full-Auto CLI"
     pad = (iw - len(sub) - 11) // 2
     print(f"  {' ' * pad}{S.MUTED}{sub}  {S.FAINT}│  by Dzul{S.R}")
+    ver_line = f"v{APP_VERSION}  ·  {BUILD_DATE}"
+    pad_v = (iw - len(ver_line)) // 2
+    print(f"  {' ' * pad_v}{S.FAINT}{ver_line}{S.R}")
     print(f"  {S.FAINT}{'─' * iw}{S.R}")
     print()
 
@@ -254,6 +262,26 @@ _SPIN = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
 
 def step(num, total, title):
+    if RICH_AVAILABLE:
+        from rich.progress import (Progress, SpinnerColumn, BarColumn,
+                                   TextColumn, TimeElapsedColumn)
+        bar_w = max(10, min(W() - 50, 24))
+        with Progress(
+            SpinnerColumn(style="cyan"),
+            TextColumn(f"  [bold cyan][{num}/{total}][/bold cyan] [bold]{title}[/bold]"),
+            BarColumn(bar_width=bar_w, complete_style="cyan", finished_style="green"),
+            TextColumn("[dim]{task.percentage:.0f}%[/dim]"),
+            TimeElapsedColumn(),
+            transient=True,
+            console=console,
+        ) as prog:
+            task = prog.add_task("", total=100)
+            for pct in range(0, 105, 20):
+                prog.update(task, completed=min(pct, 100))
+                time.sleep(0.04)
+        filled  = f"[cyan]{'━' * num}[/cyan][dim]{'╌' * (total - num)}[/dim]"
+        console.print(f"  [green]▸[/green]  {filled}  [bold]{title}[/bold]  [dim]{num}/{total}[/dim]")
+        return
     _clr()
     for i in range(6):
         ch = _SPIN[i % len(_SPIN)]
@@ -589,6 +617,9 @@ def _ask_cam_filter():
 
 
 def run_full_auto(session):
+    _t_start = time.time()
+    _steps   = [0]          # tracks last completed step number
+
     header(t("pipeline_title"), "🚀")
     print()
 
@@ -599,6 +630,7 @@ def run_full_auto(session):
     _schools = []
 
     def on_step(n, title):
+        _steps[0] = n
         step(n, 10, title)
 
     def on_log(msg, tag=""):
@@ -723,6 +755,20 @@ def run_full_auto(session):
         print()
         status(f"ERROR: {e}", "err")
 
+    # ── Run summary card ─────────────────────────────────────────
+    _t_dur   = time.time() - _t_start
+    _dur_str = f"{int(_t_dur // 60)}m {int(_t_dur % 60)}s"
+    _res_str  = (f"{S.OK}✓ Submit OK{S.R}" if submit_ok
+                 else f"{S.ERR}✗ Not submitted{S.R}")
+    print()
+    sep("Summary")
+    card_start()
+    card_row(f"{S.LABEL}Result   {S.R} {_res_str}")
+    card_row(f"{S.LABEL}Steps    {S.R} {S.ACC}{_steps[0]}/10{S.R}")
+    card_row(f"{S.LABEL}Duration {S.R} {_dur_str}")
+    card_end()
+    print()
+
     return submit_ok
 
 
@@ -735,9 +781,10 @@ def monitor_status(session):
     print(f"  {S.FAINT}{t('monitor_ctrlc')}{S.R}")
     print()
 
-    CARD = 8
+    CARD = 13            # 8 data rows + 5 history rows (sep + header + 3 entries)
     first = True
     n = 0
+    poll_history: list = []  # {time, status}  – kept last 3
 
     while True:
         n += 1
@@ -775,6 +822,10 @@ def monitor_status(session):
         else:
             sc, si, sb = S.FG, "?", S.BG_BAR
 
+        poll_history.append({"time": now, "status": st})
+        if len(poll_history) > 3:
+            poll_history = poll_history[-3:]
+
         card_lines = []
         card_lines.append(f"  {S.FAINT}{'─' * 44}{S.R}")
         card_lines.append(f"  {S.ACC}⟳{S.R}  {now}  {S.FAINT}#{n}{S.R}")
@@ -788,8 +839,26 @@ def monitor_status(session):
         if progress:
             card_lines.append(f"     {S.LABEL}Progress  {S.R}  {progress}")
 
-        while len(card_lines) < CARD:
+        # Pad main card section to exactly 8 lines
+        while len(card_lines) < 8:
             card_lines.append("")
+
+        # ── History section — always exactly 5 lines ───────────────────────
+        card_lines.append(f"  {S.FAINT}{'╌' * 22}{S.R}")
+        card_lines.append(f"  {S.MUTED}  Riwayat:{S.R}")
+        hist3 = (poll_history[-3:] + [None, None, None])[:3]
+        for ph in hist3:
+            if ph:
+                ph_sl = ph["status"].lower()
+                ph_c = (S.OK  if "approved" in ph_sl else
+                        S.ERR if any(x in ph_sl for x in ("reject", "denied")) else
+                        S.WARN)
+                card_lines.append(
+                    f"    {ph_c}·{S.R}  {S.FAINT}{ph['time']}{S.R}  {ph['status'][:26]}"
+                )
+            else:
+                card_lines.append("")
+        # total now == CARD (13) ✓
 
         if not first:
             sys.stdout.write(f"\033[{CARD + 1}A")

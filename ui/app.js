@@ -150,26 +150,32 @@ function clearAllFieldErrors() {
 }
 
 function toast(msg, type = 'ok') {
-  const t = $('toast');
-  t.textContent = msg;
-  // M3 Snackbar: reset to hidden base state then show
-  t.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg transition-all duration-300 opacity-0 translate-y-4 pointer-events-none';
-  // Apply M3 snackbar colors via inline styles
-  if (type === 'ok') {
-    t.style.background = 'var(--md-inverse-surface)';
-    t.style.color = 'var(--md-inverse-on-surface)';
-  } else if (type === 'err') {
-    t.style.background = 'var(--md-error)';
-    t.style.color = 'var(--md-on-error)';
-  } else {
-    t.style.background = 'var(--md-primary)';
-    t.style.color = 'var(--md-on-primary)';
-  }
-  // Force reflow so the transition animates from hidden → visible
-  void t.offsetWidth;
-  t.classList.add('toast-show');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('toast-show'), 3000);
+  const container = $('toast-container');
+  if (!container) return;
+
+  const ICONS = { ok: '&#10003;', err: '&#10007;', warn: '&#9888;' };
+  const COLORS = {
+    ok:   { bg: 'var(--md-inverse-surface)',    fg: 'var(--md-inverse-on-surface)' },
+    err:  { bg: 'var(--md-error)',               fg: 'var(--md-on-error)' },
+    warn: { bg: '#7B5800',                       fg: '#FFFFFF' },
+  };
+  const { bg, fg } = COLORS[type] || COLORS.ok;
+  const icon = ICONS[type] || ICONS.ok;
+
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.style.background = bg;
+  el.style.color = fg;
+  el.innerHTML = `<span>${esc(msg)}</span><span class="toast-close" onclick="this.parentElement.remove()">&#10005;</span>`;
+
+  container.prepend(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+
+  clearTimeout(el._tid);
+  el._tid = setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 320);
+  }, 3500);
 }
 
 function modal(title, body, { input = false, placeholder = '', okText = 'OK', cancelText = 'Cancel', showCancel = true } = {}) {
@@ -207,7 +213,7 @@ function nav(name) {
   if (name === 'billing')  loadBilling();
   if (name === 'edit_profile') loadProfileForm();
   if (name === 'settings') loadSettings();
-  if (name === 'auto')     refreshSchoolDropdown();
+  if (name === 'auto')     { refreshSchoolDropdown(); initStepper(); }
   if (name === 'logs')     refreshLogs();
   if (name === 'history')  loadHistory();
   // toolbar
@@ -235,6 +241,57 @@ function setStatus(text, cls) {
   const s = $('status-bar');
   s.textContent = text;
   s.className = 'text-xs ' + cls;
+}
+
+// ── Stepper ──────────────────────────────────────────────────────────
+const STEP_LABELS = [
+  'Init', 'Profile', '2FA', 'Location', 'School',
+  'Pick', 'Fill', 'Submit', 'Verify', 'Done',
+];
+
+function initStepper() {
+  const container = $('stepper');
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const item = document.createElement('div');
+    item.className = 'stepper-item';
+    item.id = `stp-${i}`;
+    const dot = document.createElement('div');
+    dot.className = 'stepper-dot';
+    dot.textContent = i;
+    dot.title = STEP_LABELS[i - 1] || `Step ${i}`;
+    item.appendChild(dot);
+    if (i < 10) {
+      const line = document.createElement('div');
+      line.className = 'stepper-line';
+      item.appendChild(line);
+    }
+    container.appendChild(item);
+  }
+}
+
+function updateStepper(n) {
+  for (let i = 1; i <= 10; i++) {
+    const item = $(`stp-${i}`);
+    if (!item) continue;
+    const dot  = item.querySelector('.stepper-dot');
+    const line = item.querySelector('.stepper-line');
+    if (!dot) continue;
+    if (i < n) {
+      dot.className = 'stepper-dot done';
+      dot.textContent = '\u2713';
+      if (line) line.className = 'stepper-line done';
+    } else if (i === n) {
+      dot.className = 'stepper-dot active';
+      dot.textContent = i;
+      if (line) line.className = 'stepper-line';
+    } else {
+      dot.className = 'stepper-dot';
+      dot.textContent = i;
+      if (line) line.className = 'stepper-line';
+    }
+  }
 }
 
 // ── Auth ─────────────────────────────────────────────────────────────
@@ -567,6 +624,8 @@ function runAuto() {
   $('a-bar').style.width = '0%';
   $('a-step').textContent = 'Starting...';
   $('a-sub').textContent = '';
+  // Reset stepper
+  initStepper();
   // Hide 2FA result card from previous run
   const tfaCard = $('a-tfa-result');
   if (tfaCard) { tfaCard.classList.add('hidden'); }
@@ -580,8 +639,7 @@ function runAuto() {
 
 window.onAutoStep = (n, t) => {
   $('a-step').textContent = `Step ${n}/10 · ${t}`;
-  $('a-bar').style.width = (n / 10 * 100) + '%';
-};
+  $('a-bar').style.width = (n / 10 * 100) + '%';  updateStepper(n);};
 window.onAutoLog = (msg, tag) => {
   const box = $('a-log');
   const span = document.createElement('span');
@@ -609,9 +667,12 @@ window.onAutoConfirmSubmit = async (info) => {
 // ── Status Monitor ───────────────────────────────────────────────────
 let _monitorInterval = null;
 let _monitorCount    = 0;
+let _statusHistory   = [];    // [{time, status, sl}] newest first
 
 window.onAutoDone = () => {
-  $('a-step').textContent += ' — Done!';
+  $('a-step').textContent += ' \u2014 Done!';
+  // Mark all steps as done in stepper
+  updateStepper(11);  // 11 > 10, so all show as done
   toast('Auto pipeline finished');
   startMonitor();
 };
@@ -619,6 +680,7 @@ window.onAutoDone = () => {
 function startMonitor() {
   stopMonitor();
   _monitorCount = 0;
+  _statusHistory = [];
   const mon = $('a-monitor');
   if (mon) mon.classList.remove('hidden');
   pollStatus();
@@ -654,6 +716,23 @@ async function pollStatus() {
   if ($('a-mon-type'))      $('a-mon-type').textContent      = app.type       || '—';
   if ($('a-mon-approved'))  $('a-mon-approved').textContent  = app.approved_on|| '—';
   if ($('a-mon-expires'))   $('a-mon-expires').textContent   = app.expires    || '—';
+
+  // ── Mini status history chart ─────────────────────────────────────
+  const timeStr = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  _statusHistory.unshift({ time: timeStr, status: st, sl });
+  if (_statusHistory.length > 10) _statusHistory.pop();
+
+  const histEl = $('a-mon-history');
+  if (histEl) {
+    histEl.innerHTML = _statusHistory.map(ph => {
+      const isApproved = /approved/i.test(ph.sl);
+      const isRejected = /rejected|denied/i.test(ph.sl);
+      const bg    = isApproved ? 'var(--md-tertiary)' : isRejected ? 'var(--md-error)' : '#B07800';
+      const label = isApproved ? '✓' : isRejected ? '✗' : '⏳';
+      return `<span class="mon-hist-dot" title="${esc(ph.time + ': ' + ph.status)}" style="background:${bg}">${label}</span>`;
+    }).join('');
+  }
+
   if (/approved|rejected|denied/i.test(sl)) {
     stopMonitor();
     toast(st, /approved/i.test(sl) ? 'ok' : 'err');
