@@ -318,6 +318,9 @@ class Api:
             pipe.run()
             self._js("onAutoDone()")
 
+        except core.SubmitCancelledError:
+            on_log("⊘ Submit dibatalkan oleh pengguna.", "warn")
+            self._js("onAutoDone()")
         except core.AccountNotEligibleError:
             on_log("", "")
             on_log("━" * 45, "err")

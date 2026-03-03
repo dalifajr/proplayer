@@ -86,6 +86,7 @@ from lib.github import (
     AccountNotEligibleError,
     create_repository,
 )
+from lib.pipeline import SubmitCancelledError
 
 # Pipeline
 from lib.pipeline import AutoPipeline

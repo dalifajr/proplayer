@@ -704,6 +704,11 @@ def run_full_auto(session):
         )
         pipe.run()
         submit_ok = True
+    except core.SubmitCancelledError:
+        _clr()
+        print()
+        print(f"  {S.WARN}⊘  Submit dibatalkan. Kembali ke login.{S.R}")
+        print()
     except core.AccountNotEligibleError as e:
         _clr()
         print()
