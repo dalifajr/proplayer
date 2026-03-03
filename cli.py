@@ -685,7 +685,7 @@ def run_full_auto(session):
         print(f"  {S.FAINT}{'─' * 44}{S.R}")
         print(f"  {S.B}{S.WARN}⚠  READY TO SUBMIT{S.R}")
         print(f"  {S.FAINT}{'─' * 44}{S.R}")
-        print(f"    {S.LABEL}School  {S.R} {chosen['name']}")
+        print(f"    {S.LABEL}School  {S.R} {_censor(chosen['name'])}")
         print(f"    {S.LABEL}City    {S.R} {ai.get('city', '')} ({ai.get('region', '')})")
         print(f"    {S.LABEL}Coords  {S.R} {slat}, {slon}")
         print(f"  {S.FAINT}{'─' * 44}{S.R}")
