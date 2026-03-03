@@ -637,6 +637,48 @@ def run_full_auto(session):
         status(t("pipeline_school_found", count=count), "ok")
         return True
 
+    def on_tfa_done(result, clip_text):
+        _clr()
+        setup_key = result.get("setup_key", "")
+        recovery  = result.get("recovery_codes", [])
+        saved_to  = result.get("saved_to", "")
+        print()
+        card_start()
+        card_row(f"{S.B}{S.OK}2FA SETUP COMPLETE{S.R}")
+        card_row(f"{S.FAINT}{'─' * 34}{S.R}")
+        card_row(f"{S.LABEL}Key    {S.R} {S.B}{S.LIME}{setup_key}{S.R}")
+        if recovery:
+            card_row(f"{S.LABEL}Codes{S.R}")
+            for i, code in enumerate(recovery, 1):
+                card_row(f"  {S.MUTED}{i:2d}.{S.R} {code}")
+        if saved_to:
+            card_row(f"{S.LABEL}File   {S.R} {S.TEAL}{os.path.basename(saved_to)}{S.R}")
+        card_end()
+        print()
+        # clipboard
+        try:
+            if os.name == "nt":
+                subprocess.run(
+                    ["clip"], input=setup_key.encode(), check=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+                status(t("tfa_clipboard"), "ok")
+            elif _is_termux():
+                subprocess.run(
+                    ["termux-clipboard-set"], input=setup_key.encode(), check=True,
+                )
+                status(t("tfa_clipboard"), "ok")
+        except Exception:
+            pass
+        # Extract username from clip_text
+        username = "unknown"
+        for line in clip_text.split("\n"):
+            if line.startswith("Username: "):
+                username = line.replace("Username: ", "").strip()
+                break
+        _open_notepad(username, setup_key, recovery)
+        status(t("tfa_notepad"), "ok")
+
     try:
         pipe = core.AutoPipeline(
             session,
@@ -644,6 +686,7 @@ def run_full_auto(session):
             on_sub=on_sub, stop=lambda: False,
             ask_use_existing=ask_existing,
             cam_filter=cam_filter,
+            on_tfa_done=on_tfa_done,
         )
         pipe.run()
         submit_ok = True
@@ -796,27 +839,7 @@ def main():
             print(f"\n\n  {S.MUTED}{t('bye')}{S.R}\n")
             break
 
-        # 2 — Account
-        try:
-            info = check_user_details(session)
-        except Exception as e:
-            status(t("failed_generic", error=e), "err")
-            input(f"\n  {S.FAINT}{t('press_enter')}{S.R}")
-            continue
-
-        # 3 — 2FA
-        try:
-            ok2 = check_and_setup_2fa(
-                session, username=info.get("username", "unknown"),
-            )
-            if not ok2:
-                status(t("tfa_failed_continue"), "warn")
-        except KeyboardInterrupt:
-            print(f"\n  {S.WARN}{t('cancelled')}{S.R}")
-            input(f"\n  {S.FAINT}{t('press_enter')}{S.R}")
-            continue
-
-        # 4 — Pipeline
+        # 2 — Pipeline (account check, 2FA, and all steps run inside)
         try:
             sok = run_full_auto(session)
         except KeyboardInterrupt:
@@ -824,7 +847,7 @@ def main():
             input(f"\n  {S.FAINT}{t('press_enter')}{S.R}")
             continue
 
-        # 5 — Monitor
+        # 3 — Monitor
         if sok:
             try:
                 monitor_status(session)

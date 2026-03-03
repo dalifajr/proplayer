@@ -278,54 +278,11 @@ class Api:
                 time.sleep(0.05)
             return False
 
+        def on_tfa_done(result, clip_text):
+            self._js(f"onAutoTfaDone({json.dumps(result)},{json.dumps(clip_text)})")
+
         try:
-            # ── Phase 1: profile info ────────────────────────────────
-            try:
-                info = core.get_profile_details(self.session)
-                self.user_info = info
-                username = info.get("username", "?")
-                age_days = info.get("age_days", 0)
-                on_log(f"@{username} · {age_days}d", "ok")
-            except Exception as e:
-                on_log(f"{t('failed_generic', error=e)}", "warn")
-
-            # ── Phase 2: 2FA check & auto-setup ─────────────────────
-            tfa_enabled = False
-            try:
-                tfa_enabled = core.check_2fa_status(self.session)
-            except Exception:
-                pass
-
-            if tfa_enabled:
-                on_log(t("tfa_already_active"), "ok")
-            else:
-                on_log(t("tfa_not_active"), "warn")
-                try:
-                    result = core.setup_2fa(
-                        self.session,
-                        on_log=lambda msg: on_sub(msg),
-                    )
-                    username = self.user_info.get("username", "?")
-                    codes = result.get("recovery_codes", [])
-                    codes_text = "\n".join(codes) if codes else "(not available)"
-                    clip_text = (
-                        f"*GitHub Students Dev Pack*\n"
-                        f"Username: {username}\n"
-                        f"Password: \n"
-                        f"F2A: {result['setup_key']}\n"
-                        f"\nRecovery Codes:\n{codes_text}"
-                    )
-                    self._js(f"onAutoTfaDone({json.dumps(result)},{json.dumps(clip_text)})")
-                    on_log(t("tfa_setup_complete"), "ok")
-                except RuntimeError as e:
-                    if "already enabled" in str(e).lower():
-                        on_log(t("tfa_detected"), "ok")
-                    else:
-                        on_log(f"{t('tfa_setup_failed', error=e)}", "warn")
-                except Exception as e:
-                    on_log(f"{t('tfa_setup_error', error=e)}", "warn")
-
-            # ── Phase 3: AutoPipeline ────────────────────────────────
+            # ── Pipeline (all 10 steps handled inside) ───────────────
             pipe = core.AutoPipeline(
                 self.session,
                 spoof_lat=lat or None, spoof_lon=lon or None,
@@ -336,6 +293,7 @@ class Api:
                 stop=lambda: self._stop_flag,
                 ask_use_existing=ask_use_existing,
                 cam_filter=cam_filter,
+                on_tfa_done=on_tfa_done,
             )
             pipe.run()
             self._js("onAutoDone()")
