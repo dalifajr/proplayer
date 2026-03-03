@@ -1,0 +1,1484 @@
+# Kata kunci pencarian sekolah (satu per baris)
+# Baris kosong dan baris diawali # akan diabaikan
+university
+school
+institut
+sekolah
+universitas
+vocational
+islamic
+politeknik
+akademi
+college
+polytechnic
+high school
+senior high
+junior high
+madrasah
+pesantren
+smk
+sma
+smp
+State
+Negeri
+Swasta
+Politeknik
+Akademi
+Institut
+Sekolah Menengah Kejuruan
+Sekolah Menengah Atas
+Sekolah Menengah Pertama
+SMK Negeri
+SMK Swasta
+SMA Negeri
+SMA Swasta
+SMP Negeri
+SMP Swasta
+Politeknik Negeri
+Politeknik Swasta
+Akademi Negeri
+Akademi Swasta
+Institut Negeri
+Institut Swasta
+UIN
+Universitas Islam
+STKIP
+STIS
+STM
+fakultas
+faculty
+school of
+department of
+jurusan
+program studi
+Pancasila
+sriwijaya
+sultan
+raden
+sukarno
+soekarno
+Indonesia
+open
+madrasah
+raja
+ratu
+bagus
+Negeri
+Swasta
+Muhammadiyah
+National
+Nusa
+Nahdotul
+Muslimin
+
+# Institusi Pendidikan di Indonesia
+
+# Universitas Negeri
+Universitas Indonesia
+Universitas Gadjah Mada
+Universitas Airlangga
+Universitas Padjadjaran
+Universitas Diponegoro
+Universitas Hasanuddin
+Universitas Brawijaya
+Universitas Sebelas Maret
+Universitas Sumatera Utara
+Universitas Andalas
+Universitas Sriwijaya
+Universitas Lampung
+Universitas Riau
+Universitas Jambi
+Universitas Bengkulu
+Universitas Sultan Ageng Tirtayasa
+Universitas Pendidikan Indonesia
+Universitas Jenderal Soedirman
+Universitas Negeri Semarang
+Universitas Negeri Yogyakarta
+Universitas Negeri Surabaya
+Universitas Negeri Malang
+Universitas Negeri Jakarta
+Universitas Negeri Medan
+Universitas Negeri Padang
+Universitas Negeri Makassar
+Universitas Negeri Manado
+Universitas Negeri Gorontalo
+Universitas Udayana
+Universitas Mataram
+Universitas Nusa Cendana
+Universitas Tanjungpura
+Universitas Palangka Raya
+Universitas Lambung Mangkurat
+Universitas Mulawarman
+Universitas Sam Ratulangi
+Universitas Tadulako
+Universitas Halu Oleo
+Universitas Pattimura
+Universitas Khairun
+Universitas Cenderawasih
+Universitas Musamus
+Universitas Papua
+Universitas Sulawesi Barat
+Universitas Timor
+Universitas Borneo Tarakan
+Universitas Maritim Raja Ali Haji
+Universitas Bangka Belitung
+Universitas Singaperbangsa Karawang
+Universitas Siliwangi
+Universitas Tidar
+Universitas Jember
+Universitas Trunojoyo Madura
+Universitas Pembangunan Nasional Veteran Jakarta
+Universitas Pembangunan Nasional Veteran Jawa Timur
+Universitas Pembangunan Nasional Veteran Yogyakarta
+Universitas Pertahanan
+Universitas Terbuka
+
+# Institut Teknologi Negeri
+Institut Teknologi Bandung
+Institut Teknologi Sepuluh Nopember
+Institut Pertanian Bogor
+Institut Teknologi Sumatera
+Institut Teknologi Kalimantan
+Institut Teknologi PLN
+
+# Politeknik Negeri
+Politeknik Negeri Jakarta
+Politeknik Negeri Bandung
+Politeknik Negeri Semarang
+Politeknik Negeri Surabaya
+Politeknik Negeri Medan
+Politeknik Negeri Padang
+Politeknik Negeri Lampung
+Politeknik Negeri Sriwijaya
+Politeknik Negeri Ujung Pandang
+Politeknik Negeri Manado
+Politeknik Negeri Bali
+Politeknik Negeri Malang
+Politeknik Negeri Jember
+Politeknik Negeri Lhokseumawe
+Politeknik Negeri Pontianak
+Politeknik Negeri Samarinda
+Politeknik Negeri Kupang
+Politeknik Negeri Ambon
+Politeknik Negeri Batam
+Politeknik Negeri Bengkalis
+Politeknik Negeri Tanah Laut
+Politeknik Negeri Balikpapan
+Politeknik Negeri Banjarmasin
+Politeknik Negeri Ketapang
+Politeknik Negeri Nusa Utara
+Politeknik Negeri Sambas
+Politeknik Negeri Fakfak
+Politeknik Negeri Cilacap
+Politeknik Negeri Madiun
+Politeknik Negeri Madura
+Politeknik Negeri Subang
+Politeknik Elektronika Negeri Surabaya
+Politeknik Manufaktur Bandung
+Politeknik Manufaktur Negeri Bangka Belitung
+Politeknik Kesehatan Kemenkes
+Politeknik Perkapalan Negeri Surabaya
+Politeknik Pertanian Negeri Samarinda
+
+# Universitas Islam Negeri (UIN)
+UIN Syarif Hidayatullah Jakarta
+UIN Sunan Gunung Djati Bandung
+UIN Sunan Kalijaga Yogyakarta
+UIN Sunan Ampel Surabaya
+UIN Walisongo Semarang
+UIN Maulana Malik Ibrahim Malang
+UIN Alauddin Makassar
+UIN Sultan Syarif Kasim Riau
+UIN Ar-Raniry Banda Aceh
+UIN Raden Intan Lampung
+UIN Raden Fatah Palembang
+UIN Sultan Thaha Saifuddin Jambi
+UIN Imam Bonjol Padang
+UIN Sumatera Utara
+UIN Antasari Banjarmasin
+UIN Mataram
+UIN Sultan Aji Muhammad Idris Samarinda
+UIN Sulthan Thaha Saifuddin
+UIN Fatmawati Sukarno Bengkulu
+UIN Prof K.H. Saifuddin Zuhri Purwokerto
+UIN Mahmud Yunus Batusangkar
+UIN K.H. Abdurrahman Wahid Pekalongan
+UIN Datokarama Palu
+UIN Sultan Maulana Hasanuddin Banten
+
+# IAIN dan STAIN
+IAIN Pontianak
+IAIN Palangka Raya
+IAIN Kendari
+IAIN Ambon
+IAIN Ternate
+IAIN Manado
+IAIN Bone
+IAIN Parepare
+IAIN Takengon
+IAIN Lhokseumawe
+IAIN Langsa
+IAIN Kerinci
+IAIN Curup
+IAIN Sorong
+IAIN Cirebon
+IAIN Metro
+STAIN Majene
+STAIN Mandailing Natal
+STAIN Bengkalis
+STAIN Teungku Dirundeng Meulaboh
+
+# Universitas Swasta Besar
+Universitas Bina Nusantara
+Universitas Trisakti
+Universitas Tarumanagara
+Universitas Pelita Harapan
+Universitas Atma Jaya
+Universitas Katolik Parahyangan
+Universitas Kristen Petra
+Universitas Kristen Satya Wacana
+Universitas Kristen Duta Wacana
+Universitas Kristen Indonesia
+Universitas Muhammadiyah Surakarta
+Universitas Muhammadiyah Yogyakarta
+Universitas Muhammadiyah Malang
+Universitas Muhammadiyah Jakarta
+Universitas Muhammadiyah Prof Dr Hamka
+Universitas Muhammadiyah Sumatera Utara
+Universitas Muhammadiyah Makassar
+Universitas Muhammadiyah Purwokerto
+Universitas Muhammadiyah Semarang
+Universitas Muhammadiyah Sidoarjo
+Universitas Muhammadiyah Ponorogo
+Universitas Muhammadiyah Purworejo
+Universitas Muhammadiyah Lampung
+Universitas Muhammadiyah Bengkulu
+Universitas Muhammadiyah Palembang
+Universitas Muhammadiyah Surabaya
+Universitas Muhammadiyah Tangerang
+Universitas Muhammadiyah Bandung
+Universitas Muhammadiyah Cirebon
+Universitas Muhammadiyah Gresik
+Universitas Muhammadiyah Jember
+Universitas Muhammadiyah Kendari
+Universitas Muhammadiyah Magelang
+Universitas Muhammadiyah Metro
+Universitas Muhammadiyah Palu
+Universitas Muhammadiyah Palopo
+Universitas Muhammadiyah Sorong
+Universitas Ahmad Dahlan
+Universitas Islam Indonesia
+Universitas Islam Sultan Agung
+Universitas Islam Malang
+Universitas Islam Bandung
+Universitas Islam Riau
+Universitas Islam Sumatera Utara
+Universitas Islam Jakarta
+Universitas Islam Lamongan
+Universitas Islam Madura
+Universitas Islam Jember
+Universitas Islam Kalimantan
+Universitas Islam Makassar
+Universitas Nahdlatul Ulama Surabaya
+Universitas Nahdlatul Ulama Indonesia
+Universitas Nahdlatul Ulama Yogyakarta
+Universitas Nahdlatul Ulama Semarang
+Universitas Nahdlatul Ulama Lampung
+Universitas Nahdlatul Ulama Purwokerto
+Universitas Gunadarma
+Universitas Mercu Buana
+Universitas Esa Unggul
+Universitas Pancasila
+Universitas Nasional
+Universitas Yarsi
+Universitas Paramadina
+Universitas Multimedia Nusantara
+Universitas Prasetiya Mulya
+Universitas Bunda Mulia
+Universitas Katolik Indonesia Atma Jaya
+Universitas Sanata Dharma
+Universitas Widya Mandala
+Universitas Ciputra
+Universitas Surabaya
+Universitas Katolik Widya Mandala Surabaya
+Universitas Kristen Maranatha
+Universitas Telkom
+Universitas Pertamina
+Universitas Negeri Oil and Gas
+Universitas Presiden
+Universitas Surya
+Universitas SGU
+Universitas Binus Nusantara
+Universitas Widyatama
+Universitas Pasundan
+Universitas Komputer Indonesia
+Universitas Maranatha
+Universitas Dian Nuswantoro
+Universitas Stikubank
+Universitas Muria Kudus
+Universitas Pekalongan
+Universitas Wahid Hasyim
+Universitas Sultan Agung
+Universitas Semarang
+Universitas PGRI Semarang
+Universitas Warmadewa
+Universitas Pendidikan Ganesha
+Universitas Mahasaraswati
+Universitas Hindu Indonesia
+Universitas Teknokrat Indonesia
+Universitas Bandar Lampung
+Universitas Malahayati
+Universitas Baturaja
+Universitas PGRI Palembang
+Universitas Batam
+Universitas Putera Batam
+Universitas Lancang Kuning
+Universitas Abdurrab
+Universitas Muhammadiyah Riau
+Universitas Bung Hatta
+Universitas Dharma Andalas
+Universitas Ekasakti
+Universitas Malikussaleh
+Universitas Syiah Kuala
+Universitas Samudra
+Universitas Teuku Umar
+Universitas Abulyatama
+Universitas Serambi Mekkah
+Universitas Muhammadiyah Aceh
+Universitas Al Muslim
+Universitas Alkhairaat
+Universitas Tadulako
+Universitas Tompotika Luwuk
+Universitas Muhammadiyah Luwuk
+Universitas Sembilanbelas November Kolaka
+Universitas Dayanu Ikhsanuddin
+Universitas Lakidende
+Universitas Haluoleo
+Universitas Muhammadiyah Buton
+Universitas Gorontalo
+Universitas Ichsan Gorontalo
+Universitas Muslim Indonesia
+Universitas Fajar
+Universitas Bosowa
+Universitas Negeri Bone
+Universitas Muhammadiyah Bone
+Universitas Muhammadiyah Parepare
+Universitas Muhammadiyah Rappang
+Universitas Andi Djemma
+Universitas Cokroaminoto Palopo
+Universitas Sawerigading
+Universitas Kristen Indonesia Toraja
+Universitas Kristen Indonesia Paulus
+Universitas Atma Jaya Makassar
+Universitas Hasanuddin
+Universitas 17 Agustus 1945 Surabaya
+Universitas 17 Agustus 1945 Semarang
+Universitas 17 Agustus 1945 Jakarta
+Universitas 17 Agustus 1945 Cirebon
+Universitas 17 Agustus 1945 Banyuwangi
+Universitas 17 Agustus 1945 Samarinda
+Universitas Krisnadwipayana
+Universitas Borobudur
+Universitas Jayabaya
+Universitas Bhayangkara Jakarta Raya
+Universitas Bhayangkara Surabaya
+Universitas Merdeka Malang
+Universitas Merdeka Surabaya
+Universitas Merdeka Madiun
+Universitas Wijaya Kusuma Surabaya
+Universitas PGRI Adi Buana Surabaya
+Universitas PGRI Madiun
+Universitas PGRI Kediri
+Universitas PGRI Ronggolawe Tuban
+Universitas PGRI Banyuwangi
+Universitas Dr Soetomo
+Universitas Hang Tuah
+Universitas WR Supratman
+Universitas Islam Darul Ulum Lamongan
+Universitas Muhammadiyah Lamongan
+Universitas Islam Majapahit
+Universitas Trunojoyo
+
+# Sekolah Tinggi (ST)
+STIE Indonesia
+STIE Perbanas
+STIE Trisakti
+STIE YKPN
+STKIP PGRI
+STKIP Muhammadiyah
+STT Telkom
+STMIK Amikom
+STMIK Akakom
+STMIK Nusa Mandiri
+STIKES
+STBA
+STIA LAN
+STIESIA
+STIKOM
+STIT
+STABN
+STAHN
+STAKN
+STAB
+
+# Akademi dan Sekolah Vokasi
+Akademi Keperawatan
+Akademi Kebidanan
+Akademi Farmasi
+Akademi Pariwisata
+Akademi Teknik
+Akademi Perbankan
+Akademi Sekretari
+Akademi Militer
+Akademi Kepolisian
+Akademi Angkatan Laut
+Akademi Angkatan Udara
+Sekolah Vokasi UGM
+Sekolah Vokasi UI
+Sekolah Vokasi UNDIP
+Sekolah Vokasi IPB
+
+# Sekolah Kedinasan
+STIS BPS
+STAN PKN
+STMKG
+STTD
+STIP
+SIPSS
+Akpol
+Akmil
+AAL
+AAU
+IPDN
+STSN
+Poltekkes Kemenkes
+Politeknik Keuangan Negara STAN
+Politeknik Statistika STIS
+Sekolah Tinggi Meteorologi Klimatologi dan Geofisika
+Sekolah Tinggi Transportasi Darat
+Sekolah Tinggi Ilmu Pelayaran
+Sekolah Tinggi Sandi Negara
+Sekolah Tinggi Penerbangan Indonesia
+Politeknik Imigrasi
+Politeknik Ilmu Pemasyarakatan
+Politeknik Siber dan Sandi Negara
+
+# Pesantren dan Madrasah
+Pondok Pesantren
+Pesantren Modern
+Pesantren Gontor
+Pesantren Tebuireng
+Pesantren Lirboyo
+Pesantren Sidogiri
+Pesantren Darul Ulum
+Pesantren Al-Amien
+Pesantren Darunnajah
+Pesantren Daar el-Qolam
+Pesantren La Tansa
+Pesantren Cipasung
+Pesantren Buntet
+Pesantren Suryalaya
+Pesantren Al-Ittifaqiah
+Pesantren Raudhatul Hasanah
+Pesantren Musthafawiyah
+Pesantren Al-Khoirot
+Pesantren Nurul Jadid
+Pesantren Salafiyah Syafi'iyah Sukorejo
+Pesantren Al-Falah
+Pesantren Assalam
+Pesantren MBS
+Pesantren Daarut Tauhid
+Madrasah Aliyah Negeri
+Madrasah Tsanawiyah Negeri
+Madrasah Ibtidaiyah Negeri
+MAN
+MTsN
+MIN
+MAN Insan Cendekia
+
+# Kata Kunci Tambahan Pendidikan
+Sekolah Tinggi
+Sekolah Tinggi Ilmu
+Sekolah Tinggi Teknologi
+Sekolah Tinggi Ekonomi
+Sekolah Tinggi Kesehatan
+Sekolah Tinggi Agama Islam
+Sekolah Tinggi Agama Hindu
+Sekolah Tinggi Agama Buddha
+Sekolah Tinggi Agama Kristen
+Sekolah Tinggi Teologi
+PGRI
+IKIP
+FKIP
+Keguruan
+Ilmu Pendidikan
+teknik
+kedokteran
+hukum
+ekonomi
+pertanian
+perikanan
+kehutanan
+farmasi
+kesehatan
+keperawatan
+kebidanan
+pariwisata
+perhotelan
+manajemen
+akuntansi
+informatika
+komputer
+sistem informasi
+teknologi informasi
+ilmu komunikasi
+hubungan internasional
+administrasi publik
+administrasi bisnis
+psikologi
+sosiologi
+sastra
+bahasa
+seni
+desain
+arsitektur
+sipil
+mesin
+elektro
+kimia
+fisika
+matematika
+biologi
+geografi
+geologi
+planologi
+statistika
+oseanografi
+meteorologi
+astronomi
+
+# English Version Keywords - Institution Types
+University of
+Institute of
+State University
+Private University
+State Polytechnic
+State Islamic University
+State Institute
+College of
+Academy of
+School of
+Vocational School
+Graduate School
+Postgraduate
+Undergraduate
+Higher Education
+Educational Institution
+State College
+Community College
+Technical College
+Teacher Training
+Islamic Boarding School
+Islamic School
+Religious School
+Theological Seminary
+Public School
+Public University
+Private College
+Open University
+Defense University
+National Development University
+
+# English - Fields of Study
+Engineering
+Medicine
+Medical
+Law
+Legal
+Economics
+Business
+Agriculture
+Fisheries
+Forestry
+Pharmacy
+Pharmaceutical
+Health Sciences
+Nursing
+Midwifery
+Tourism
+Hospitality
+Management
+Accounting
+Informatics
+Computer Science
+Information Systems
+Information Technology
+Communication
+International Relations
+Public Administration
+Business Administration
+Psychology
+Sociology
+Literature
+Language
+Arts
+Design
+Architecture
+Civil Engineering
+Mechanical Engineering
+Electrical Engineering
+Chemical Engineering
+Chemistry
+Physics
+Mathematics
+Biology
+Geography
+Geology
+Urban Planning
+Statistics
+Oceanography
+Meteorology
+Astronomy
+Education
+Teacher Education
+Islamic Studies
+Islamic Education
+Hindu Studies
+Buddhist Studies
+Christian Studies
+Theology
+Science
+Social Science
+Political Science
+Philosophy
+History
+Anthropology
+Archaeology
+Environmental Science
+Marine Science
+Veterinary
+Dentistry
+Public Health
+Nutrition
+Food Technology
+Industrial Engineering
+Aerospace Engineering
+Mining Engineering
+Petroleum Engineering
+Textile Engineering
+Agricultural Engineering
+Biomedical Engineering
+Biotechnology
+Nanotechnology
+Renewable Energy
+Data Science
+Artificial Intelligence
+Cybersecurity
+Software Engineering
+Multimedia
+Visual Communication Design
+Interior Design
+Fashion Design
+Product Design
+Fine Arts
+Performing Arts
+Music
+Dance
+Film
+Photography
+Animation
+Sports Science
+Physical Education
+Library Science
+Archival Science
+Criminology
+Social Work
+Counseling
+Special Education
+Early Childhood Education
+
+# English - University Names (Common English Names)
+University of Indonesia
+Gadjah Mada University
+Airlangga University
+Padjadjaran University
+Diponegoro University
+Hasanuddin University
+Brawijaya University
+Sebelas Maret University
+University of North Sumatra
+Andalas University
+Sriwijaya University
+University of Lampung
+University of Riau
+University of Jambi
+University of Bengkulu
+Sultan Ageng Tirtayasa University
+Indonesia University of Education
+Jenderal Soedirman University
+Semarang State University
+Yogyakarta State University
+Surabaya State University
+Malang State University
+Jakarta State University
+Medan State University
+Padang State University
+Makassar State University
+Manado State University
+Gorontalo State University
+Udayana University
+University of Mataram
+Nusa Cendana University
+Tanjungpura University
+Palangka Raya University
+Lambung Mangkurat University
+Mulawarman University
+Sam Ratulangi University
+Tadulako University
+Halu Oleo University
+Pattimura University
+Khairun University
+Cenderawasih University
+Musamus University
+University of Papua
+West Sulawesi University
+Timor University
+Borneo Tarakan University
+Raja Ali Haji Maritime University
+Bangka Belitung University
+Singaperbangsa Karawang University
+Siliwangi University
+Tidar University
+University of Jember
+Trunojoyo University Madura
+National Development University Veteran Jakarta
+National Development University Veteran East Java
+National Development University Veteran Yogyakarta
+Defense University
+Open University of Indonesia
+Bandung Institute of Technology
+Sepuluh Nopember Institute of Technology
+Bogor Agricultural University
+Sumatera Institute of Technology
+Kalimantan Institute of Technology
+State Polytechnic of Jakarta
+State Polytechnic of Bandung
+State Polytechnic of Semarang
+State Polytechnic of Surabaya
+State Polytechnic of Medan
+State Polytechnic of Padang
+State Polytechnic of Lampung
+Sriwijaya State Polytechnic
+Ujung Pandang State Polytechnic
+Manado State Polytechnic
+Bali State Polytechnic
+Malang State Polytechnic
+Jember State Polytechnic
+Lhokseumawe State Polytechnic
+Pontianak State Polytechnic
+Samarinda State Polytechnic
+Kupang State Polytechnic
+Ambon State Polytechnic
+Batam State Polytechnic
+Electronics Engineering Polytechnic Institute of Surabaya
+Bandung Manufacturing Polytechnic
+Shipbuilding State Polytechnic of Surabaya
+Syarif Hidayatullah State Islamic University Jakarta
+Sunan Gunung Djati State Islamic University Bandung
+Sunan Kalijaga State Islamic University Yogyakarta
+Sunan Ampel State Islamic University Surabaya
+Walisongo State Islamic University Semarang
+Maulana Malik Ibrahim State Islamic University Malang
+Alauddin State Islamic University Makassar
+Sultan Syarif Kasim State Islamic University Riau
+Ar-Raniry State Islamic University Banda Aceh
+Raden Intan State Islamic University Lampung
+Raden Fatah State Islamic University Palembang
+North Sumatra State Islamic University
+Antasari State Islamic University Banjarmasin
+Mataram State Islamic University
+Bina Nusantara University
+Trisakti University
+Tarumanagara University
+Pelita Harapan University
+Atma Jaya University
+Parahyangan Catholic University
+Petra Christian University
+Satya Wacana Christian University
+Duta Wacana Christian University
+Christian University of Indonesia
+Ahmad Dahlan University
+Islamic University of Indonesia
+Sultan Agung Islamic University
+Gunadarma University
+Mercu Buana University
+Esa Unggul University
+Pancasila University
+National University
+Yarsi University
+Paramadina University
+Multimedia Nusantara University
+Prasetiya Mulya University
+Bunda Mulia University
+Atma Jaya Catholic University of Indonesia
+Sanata Dharma University
+Widya Mandala University
+Ciputra University
+University of Surabaya
+Maranatha Christian University
+Telkom University
+Pertamina University
+President University
+Surya University
+Swiss German University
+Widyatama University
+Pasundan University
+Indonesia Computer University
+Dian Nuswantoro University
+Stikubank University
+Muria Kudus University
+Pekalongan University
+Wahid Hasyim University
+Sultan Agung University
+Semarang University
+Warmadewa University
+Ganesha University of Education
+Mahasaraswati University
+Hindu University of Indonesia
+Teknokrat University of Indonesia
+Bandar Lampung University
+Baturaja University
+Batam University
+Putera Batam University
+Lancang Kuning University
+Abdurrab University
+Bung Hatta University
+Malikussaleh University
+Syiah Kuala University
+Samudra University
+Teuku Umar University
+Muslim University of Indonesia
+Fajar University
+Bosowa University
+
+# English - Education Level Keywords
+Elementary School
+Primary School
+Middle School
+Secondary School
+Junior High School
+Senior High School
+Vocational High School
+High School
+Diploma
+Bachelor
+Master
+Doctorate
+PhD
+Associate Degree
+Professional Degree
+Certificate Program
+Foundation Year
+Pre-University
+Preparatory
+Remedial
+Continuing Education
+Distance Learning
+Online Learning
+E-Learning
+Blended Learning
+
+# English - Academic Terms
+Faculty
+Department
+Study Program
+Curriculum
+Accreditation
+Campus
+Rector
+Dean
+Professor
+Lecturer
+Student
+Alumni
+Research
+Laboratory
+Library
+Scholarship
+Exchange Program
+Internship
+Thesis
+Dissertation
+Seminar
+Conference
+Workshop
+Symposium
+Academic
+Semester
+Credit
+GPA
+Graduation
+Commencement
+Enrollment
+Admission
+Registration
+Matriculation
+Tuition
+Fellowship
+Grant
+Endowment
+Provost
+Chancellor
+
+# Kota dan Kabupaten di Indonesia
+# Provinsi Aceh
+Banda Aceh
+Sabang
+Langsa
+Lhokseumawe
+Subulussalam
+Aceh Besar
+Aceh Barat
+Aceh Barat Daya
+Aceh Jaya
+Aceh Selatan
+Aceh Singkil
+Aceh Tamiang
+Aceh Tengah
+Aceh Tenggara
+Aceh Timur
+Aceh Utara
+Bener Meriah
+Bireuen
+Gayo Lues
+Nagan Raya
+Pidie
+Pidie Jaya
+Simeulue
+
+# Provinsi Sumatera Utara
+Medan
+Binjai
+Padang Sidempuan
+Pematang Siantar
+Sibolga
+Tanjung Balai
+Tebing Tinggi
+Gunungsitoli
+Asahan
+Batubara
+Dairi
+Deli Serdang
+Humbang Hasundutan
+Karo
+Labuhanbatu
+Labuhanbatu Selatan
+Labuhanbatu Utara
+Langkat
+Mandailing Natal
+Nias
+Nias Barat
+Nias Selatan
+Nias Utara
+Padang Lawas
+Padang Lawas Utara
+Pakpak Bharat
+Samosir
+Serdang Bedagai
+Simalungun
+Tapanuli Selatan
+Tapanuli Tengah
+Tapanuli Utara
+Toba Samosir
+
+# Provinsi Sumatera Barat
+Padang
+Bukittinggi
+Padang Panjang
+Pariaman
+Payakumbuh
+Sawahlunto
+Solok
+Agam
+Dharmasraya
+Kepulauan Mentawai
+Lima Puluh Kota
+Padang Pariaman
+Pasaman
+Pasaman Barat
+Pesisir Selatan
+Sijunjung
+Solok Selatan
+Tanah Datar
+
+# Provinsi Riau
+Pekanbaru
+Dumai
+Bengkalis
+Indragiri Hilir
+Indragiri Hulu
+Kampar
+Kepulauan Meranti
+Kuantan Singingi
+Pelalawan
+Rokan Hilir
+Rokan Hulu
+Siak
+
+# Provinsi Kepulauan Riau
+Batam
+Tanjung Pinang
+Bintan
+Karimun
+Kepulauan Anambas
+Lingga
+Natuna
+
+# Provinsi Jambi
+Jambi
+Sungai Penuh
+Batanghari
+Bungo
+Kerinci
+Merangin
+Muaro Jambi
+Sarolangun
+Tanjung Jabung Barat
+Tanjung Jabung Timur
+Tebo
+
+# Provinsi Sumatera Selatan
+Palembang
+Lubuklinggau
+Pagar Alam
+Prabumulih
+Banyuasin
+Empat Lawang
+Lahat
+Muara Enim
+Musi Banyuasin
+Musi Rawas
+Musi Rawas Utara
+Ogan Ilir
+Ogan Komering Ilir
+Ogan Komering Ulu
+Ogan Komering Ulu Selatan
+Ogan Komering Ulu Timur
+Penukal Abab Lematang Ilir
+
+# Provinsi Bengkulu
+Bengkulu
+Bengkulu Selatan
+Bengkulu Tengah
+Bengkulu Utara
+Kaur
+Kepahiang
+Lebong
+Mukomuko
+Rejang Lebong
+Seluma
+
+# Provinsi Lampung
+Bandar Lampung
+Metro
+Lampung Barat
+Lampung Selatan
+Lampung Tengah
+Lampung Timur
+Lampung Utara
+Mesuji
+Pesawaran
+Pesisir Barat
+Pringsewu
+Tanggamus
+Tulang Bawang
+Tulang Bawang Barat
+Way Kanan
+
+# Provinsi Bangka Belitung
+Pangkal Pinang
+Bangka
+Bangka Barat
+Bangka Selatan
+Bangka Tengah
+Belitung
+Belitung Timur
+
+# Provinsi DKI Jakarta
+Jakarta
+Jakarta Barat
+Jakarta Pusat
+Jakarta Selatan
+Jakarta Timur
+Jakarta Utara
+Kepulauan Seribu
+
+# Provinsi Jawa Barat
+Bandung
+Bekasi
+Bogor
+Cimahi
+Cirebon
+Depok
+Sukabumi
+Tasikmalaya
+Banjar
+Bandung Barat
+Ciamis
+Cianjur
+Garut
+Indramayu
+Karawang
+Kuningan
+Majalengka
+Pangandaran
+Purwakarta
+Subang
+Sumedang
+
+# Provinsi Banten
+Cilegon
+Serang
+Tangerang
+Tangerang Selatan
+Lebak
+Pandeglang
+
+# Provinsi Jawa Tengah
+Semarang
+Magelang
+Pekalongan
+Salatiga
+Surakarta
+Tegal
+Banjarnegara
+Batang
+Blora
+Boyolali
+Brebes
+Cilacap
+Demak
+Grobogan
+Jepara
+Karanganyar
+Kebumen
+Kendal
+Klaten
+Kudus
+Pati
+Pemalang
+Purbalingga
+Purworejo
+Rembang
+Sragen
+Temanggung
+Wonogiri
+Wonosobo
+
+# Provinsi DI Yogyakarta
+Yogyakarta
+Bantul
+Gunungkidul
+Kulon Progo
+Sleman
+
+# Provinsi Jawa Timur
+Surabaya
+Batu
+Blitar
+Kediri
+Madiun
+Malang
+Mojokerto
+Pasuruan
+Probolinggo
+Bangkalan
+Banyuwangi
+Bojonegoro
+Bondowoso
+Gresik
+Jember
+Jombang
+Lamongan
+Lumajang
+Magetan
+Nganjuk
+Ngawi
+Pacitan
+Pamekasan
+Ponorogo
+Sampang
+Sidoarjo
+Situbondo
+Sumenep
+Trenggalek
+Tuban
+Tulungagung
+
+# Provinsi Bali
+Denpasar
+Badung
+Bangli
+Buleleng
+Gianyar
+Jembrana
+Karangasem
+Klungkung
+Tabanan
+
+# Provinsi Nusa Tenggara Barat
+Mataram
+Bima
+Dompu
+Lombok Barat
+Lombok Tengah
+Lombok Timur
+Lombok Utara
+Sumbawa
+Sumbawa Barat
+
+# Provinsi Nusa Tenggara Timur
+Kupang
+Ende
+Flores Timur
+Lembata
+Manggarai
+Manggarai Barat
+Manggarai Timur
+Nagekeo
+Ngada
+Alor
+Belu
+Malaka
+Rote Ndao
+Sabu Raijua
+Sikka
+Sumba Barat
+Sumba Barat Daya
+Sumba Tengah
+Sumba Timur
+Timor Tengah Selatan
+Timor Tengah Utara
+
+# Provinsi Kalimantan Barat
+Pontianak
+Singkawang
+Bengkayang
+Kapuas Hulu
+Kayong Utara
+Ketapang
+Kubu Raya
+Landak
+Melawi
+Mempawah
+Sambas
+Sanggau
+Sekadau
+Sintang
+
+# Provinsi Kalimantan Tengah
+Palangka Raya
+Barito Selatan
+Barito Timur
+Barito Utara
+Gunung Mas
+Kapuas
+Katingan
+Kotawaringin Barat
+Kotawaringin Timur
+Lamandau
+Murung Raya
+Pulang Pisau
+Seruyan
+Sukamara
+
+# Provinsi Kalimantan Selatan
+Banjarmasin
+Banjarbaru
+Balangan
+Banjar
+Barito Kuala
+Hulu Sungai Selatan
+Hulu Sungai Tengah
+Hulu Sungai Utara
+Kotabaru
+Tabalong
+Tanah Bumbu
+Tanah Laut
+Tapin
+
+# Provinsi Kalimantan Timur
+Samarinda
+Balikpapan
+Bontang
+Berau
+Kutai Barat
+Kutai Kartanegara
+Kutai Timur
+Mahakam Ulu
+Paser
+Penajam Paser Utara
+
+# Provinsi Kalimantan Utara
+Tarakan
+Bulungan
+Malinau
+Nunukan
+Tana Tidung
+
+# Provinsi Sulawesi Utara
+Manado
+Bitung
+Kotamobagu
+Tomohon
+Bolaang Mongondow
+Bolaang Mongondow Selatan
+Bolaang Mongondow Timur
+Bolaang Mongondow Utara
+Kepulauan Sangihe
+Kepulauan Siau Tagulandang Biaro
+Kepulauan Talaud
+Minahasa
+Minahasa Selatan
+Minahasa Tenggara
+Minahasa Utara
+
+# Provinsi Gorontalo
+Gorontalo
+Boalemo
+Bone Bolango
+Gorontalo Utara
+Pohuwato
+
+# Provinsi Sulawesi Tengah
+Palu
+Banggai
+Banggai Kepulauan
+Banggai Laut
+Buol
+Donggala
+Morowali
+Morowali Utara
+Parigi Moutong
+Poso
+Sigi
+Tojo Una-Una
+Toli-Toli
+
+# Provinsi Sulawesi Barat
+Mamuju
+Majene
+Mamasa
+Mamuju Tengah
+Pasangkayu
+Polewali Mandar
+
+# Provinsi Sulawesi Selatan
+Makassar
+Palopo
+Parepare
+Bantaeng
+Barru
+Bone
+Bulukumba
+Enrekang
+Gowa
+Jeneponto
+Kepulauan Selayar
+Luwu
+Luwu Timur
+Luwu Utara
+Maros
+Pangkajene dan Kepulauan
+Pinrang
+Sidenreng Rappang
+Sinjai
+Soppeng
+Takalar
+Tana Toraja
+Toraja Utara
+Wajo
+
+# Provinsi Sulawesi Tenggara
+Kendari
+Bau-Bau
+Bombana
+Buton
+Buton Selatan
+Buton Tengah
+Buton Utara
+Kolaka
+Kolaka Timur
+Kolaka Utara
+Konawe
+Konawe Kepulauan
+Konawe Selatan
+Konawe Utara
+Muna
+Muna Barat
+Wakatobi
+
+# Provinsi Maluku
+Ambon
+Tual
+Buru
+Buru Selatan
+Kepulauan Aru
+Kepulauan Tanimbar
+Maluku Barat Daya
+Maluku Tengah
+Maluku Tenggara
+Seram Bagian Barat
+Seram Bagian Timur
+
+# Provinsi Maluku Utara
+Ternate
+Tidore Kepulauan
+Halmahera Barat
+Halmahera Selatan
+Halmahera Tengah
+Halmahera Timur
+Halmahera Utara
+Kepulauan Sula
+Pulau Morotai
+Pulau Taliabu
+
+# Provinsi Papua
+Jayapura
+Biak Numfor
+Deiyai
+Dogiyai
+Intan Jaya
+Jayawijaya
+Keerom
+Kepulauan Yapen
+Lanny Jaya
+Mamberamo Raya
+Mamberamo Tengah
+Memberamo
+Merauke
+Mimika
+Nabire
+Nduga
+Paniai
+Pegunungan Bintang
+Puncak
+Puncak Jaya
+Sarmi
+Supiori
+Tolikara
+Waropen
+Yahukimo
+Yalimo
+
+# Provinsi Papua Barat
+Manokwari
+Sorong
+Fakfak
+Kaimana
+Maybrat
+Raja Ampat
+Sorong Selatan
+Tambrauw
+Teluk Bintuni
+Teluk Wondama

@@ -1,0 +1,817 @@
+#!/usr/bin/env python3
+"""
+GitHub Edu Pro — CLI Full-Auto Mode
+====================================
+Double-click via .bat to run in CMD/terminal.
+
+Flow:
+  1. Login via cookie
+  2. Cek detail user
+  3. Cek 2FA → jika belum, setup otomatis & simpan detail
+  4. Jalankan Full Auto (8 step pipeline)
+  5. Jika submit berhasil, tampilkan status & refresh tiap 5 detik
+  6. Jika status = Approved → berhenti, kembali ke login
+"""
+
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+from datetime import datetime
+
+# ── Fix working directory ─────────────────────────────────────────────────
+if getattr(sys, "frozen", False):
+    BASE = os.path.dirname(sys.executable)
+else:
+    BASE = os.path.dirname(os.path.abspath(__file__))
+os.chdir(BASE)
+
+import core
+from i18n import t, set_language, get_language
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  ANSI / TERMINAL PRIMITIVES
+# ══════════════════════════════════════════════════════════════════════════
+class C:
+    """256-color & true-color ANSI escape helpers."""
+    RESET  = "\033[0m"
+    BOLD   = "\033[1m"
+    DIM    = "\033[2m"
+    ITALIC = "\033[3m"
+    UNDER  = "\033[4m"
+    BLINK  = "\033[5m"
+    # ── Foreground (bright) ──
+    RED     = "\033[38;5;203m"
+    GREEN   = "\033[38;5;114m"
+    YELLOW  = "\033[38;5;221m"
+    BLUE    = "\033[38;5;111m"
+    MAGENTA = "\033[38;5;176m"
+    CYAN    = "\033[38;5;80m"
+    WHITE   = "\033[97m"
+    GRAY    = "\033[38;5;245m"
+    ORANGE  = "\033[38;5;209m"
+    LIME    = "\033[38;5;156m"
+    PINK    = "\033[38;5;211m"
+    TEAL    = "\033[38;5;73m"
+    # ── Accent gradient (cyan→blue) ──
+    G1 = "\033[38;5;45m"
+    G2 = "\033[38;5;39m"
+    G3 = "\033[38;5;33m"
+    G4 = "\033[38;5;27m"
+    # ── Background ──
+    BG_DARK    = "\033[48;5;235m"
+    BG_DARKER  = "\033[48;5;233m"
+    BG_GREEN   = "\033[48;5;22m"
+    BG_RED     = "\033[48;5;52m"
+    BG_BLUE    = "\033[48;5;17m"
+    BG_YELLOW  = "\033[48;5;58m"
+    BG_CYAN    = "\033[48;5;23m"
+    BG_SUCCESS = "\033[48;5;28m"
+    BG_DANGER  = "\033[48;5;124m"
+    BG_WARN    = "\033[48;5;136m"
+    # ── Control ──
+    ERASE    = "\033[2K"
+    HIDE_CUR = "\033[?25l"
+    SHOW_CUR = "\033[?25h"
+
+    @staticmethod
+    def fg256(n):
+        return f"\033[38;5;{n}m"
+
+    @staticmethod
+    def bg256(n):
+        return f"\033[48;5;{n}m"
+
+
+# ── Adaptive width ───────────────────────────────────────────────────────
+def W():
+    """Current terminal width."""
+    try:
+        return os.get_terminal_size().columns
+    except Exception:
+        return 80
+
+
+def enable_ansi_windows():
+    if os.name == "nt":
+        try:
+            import ctypes
+            k = ctypes.windll.kernel32
+            k.SetConsoleMode(k.GetStdHandle(-11), 7)
+        except Exception:
+            pass
+
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def _sa(text):
+    """Strip ANSI codes → visible length."""
+    return re.sub(r'\033\[[0-9;]*m', '', text)
+
+
+def _inline(text):
+    """Write text in-place on the current line."""
+    w = W()
+    if len(_sa(text)) > w - 1:
+        text = text[:w - 4] + C.DIM + "…" + C.RESET
+    sys.stdout.write(f"\r{C.ERASE}{text}")
+    sys.stdout.flush()
+
+
+def _clear_inline():
+    sys.stdout.write(f"\r{C.ERASE}")
+    sys.stdout.flush()
+
+
+# ── School-name censor ───────────────────────────────────────────────────
+def _censor(name):
+    if not name or len(name) <= 3:
+        return "***"
+    return name[:3] + "•" * min(len(name) - 3, 12)
+
+
+def _censor_text(text, names):
+    for n in names:
+        if n and n in text:
+            text = text.replace(n, _censor(n))
+    return text
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  🎨  PRETTY-PRINT BUILDING BLOCKS
+# ══════════════════════════════════════════════════════════════════════════
+
+# ── Gradient text (char-by-char color ramp) ──────────────────────────────
+_GRAD_CYAN = [45, 44, 38, 37, 36, 30, 31, 32, 33, 39, 45]
+
+def _gradient(text, palette=None):
+    """Apply a 256-color gradient across characters."""
+    pal = palette or _GRAD_CYAN
+    out = []
+    vis = [ch for ch in text]
+    for i, ch in enumerate(vis):
+        c = pal[i % len(pal)]
+        out.append(f"\033[38;5;{c}m{ch}")
+    out.append(C.RESET)
+    return "".join(out)
+
+
+# ── Box drawing ──────────────────────────────────────────────────────────
+def _box_top(w, color=C.CYAN):
+    return f"{color}╭{'─' * w}╮{C.RESET}"
+
+def _box_mid(w, color=C.CYAN):
+    return f"{color}├{'─' * w}┤{C.RESET}"
+
+def _box_bot(w, color=C.CYAN):
+    return f"{color}╰{'─' * w}╯{C.RESET}"
+
+def _box_row(content, w, color=C.CYAN):
+    vis = len(_sa(content))
+    pad = max(0, w - vis - 1)
+    return f"{color}│{C.RESET} {content}{' ' * pad}{color}│{C.RESET}"
+
+def _dbox_top(w, color=C.CYAN):
+    return f"{color}╔{'═' * w}╗{C.RESET}"
+
+def _dbox_bot(w, color=C.CYAN):
+    return f"{color}╚{'═' * w}╝{C.RESET}"
+
+def _dbox_row(content, w, color=C.CYAN):
+    vis = len(_sa(content))
+    pad = max(0, w - vis - 1)
+    return f"{color}║{C.RESET} {content}{' ' * pad}{color}║{C.RESET}"
+
+
+# ── Banner ───────────────────────────────────────────────────────────────
+def print_banner():
+    w = W()
+    bw = min(w - 2, 64)  # box width (inner)
+
+    if w < 45:
+        print(f"\n  {C.BOLD}{_gradient('GitHub Edu Pro')}{C.RESET} 🚀")
+        print(f"  {C.DIM}Full Auto CLI — by Dzul{C.RESET}\n")
+        return
+
+    # ── Gradient accent line ──
+    accent = _gradient("━" * (bw + 2))
+    print(f"\n  {accent}")
+
+    # ── Double-border box ──
+    col = C.G1
+    print(f"  {_dbox_top(bw, col)}")
+
+    if w >= 64:
+        logo = [
+            "   ██████╗ ██╗████████╗██╗  ██╗██╗   ██╗██████╗  ",
+            "  ██╔════╝ ██║╚══██╔══╝██║  ██║██║   ██║██╔══██╗ ",
+            "  ██║  ███╗██║   ██║   ███████║██║   ██║██████╔╝ ",
+            "  ██║   ██║██║   ██║   ██╔══██║██║   ██║██╔══██╗ ",
+            "  ╚██████╔╝██║   ██║   ██║  ██║╚██████╔╝██████╔╝ ",
+            "   ╚═════╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ",
+        ]
+        print(f"  {_dbox_row('', bw, col)}")
+        grad_pal = [45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+        for line in logo:
+            colored_line = _gradient(line, grad_pal)
+            vis = len(line)
+            lpad = (bw - vis) // 2
+            rpad = bw - vis - lpad - 1
+            print(f"  {col}║{C.RESET}{' ' * lpad}{colored_line}{' ' * rpad}{col}║{C.RESET}")
+        print(f"  {_dbox_row('', bw, col)}")
+    else:
+        print(f"  {_dbox_row('', bw, col)}")
+        t = _gradient(" G I T H U B ")
+        vis = len(" G I T H U B ")
+        lp = (bw - vis) // 2
+        rp = bw - vis - lp - 1
+        print(f"  {col}║{C.RESET}{' ' * lp}{t}{' ' * rp}{col}║{C.RESET}")
+        print(f"  {_dbox_row('', bw, col)}")
+
+    # ── Subtitle ──
+    sub = "Penakluk GitHub Edu Pro — by Dzul"
+    sub_colored = f"{C.LIME}{C.BOLD}{sub}{C.RESET}"
+    sp = (bw - len(sub)) // 2
+    rp = bw - len(sub) - sp - 1
+    print(f"  {col}║{C.RESET}{' ' * sp}{sub_colored}{' ' * rp}{col}║{C.RESET}")
+
+    # ── Byline ──
+    by = "by Dzul 🚀"
+    bp = (bw - len(by)) // 2
+    brp = bw - len(by) - bp - 1
+    print(f"  {col}║{C.RESET}{' ' * bp}{C.GRAY}{by}{C.RESET}{' ' * brp}{col}║{C.RESET}")
+
+    print(f"  {_dbox_row('', bw, col)}")
+    print(f"  {_dbox_bot(bw, col)}")
+
+    accent2 = _gradient("━" * (bw + 2))
+    print(f"  {accent2}\n")
+
+
+# ── Section header ───────────────────────────────────────────────────────
+def print_header(title, icon=""):
+    w = W()
+    iw = min(w - 6, 60)
+    text = f"{icon}  {title}"
+    if len(text) > iw:
+        text = text[:iw - 1] + "…"
+
+    grad_line = _gradient("─" * (iw + 2))
+    print()
+    print(f"  {grad_line}")
+    # Title bar with background
+    pad = iw - len(_sa(text))
+    print(f"  {C.BG_DARK}{C.BOLD}{C.CYAN} {text}{' ' * pad} {C.RESET}")
+    print(f"  {grad_line}")
+
+
+# ── Separator / Divider ──────────────────────────────────────────────────
+def print_separator(char="─", color=C.DIM):
+    w = W()
+    print(f"  {color}{char * (w - 4)}{C.RESET}")
+
+
+def print_divider(label="", color=C.GRAY):
+    w = W()
+    if label:
+        side = max(2, (w - len(label) - 8) // 2)
+        print(f"  {color}{'─' * side} {C.RESET}{C.BOLD}{C.CYAN}{label}{C.RESET}{color} {'─' * side}{C.RESET}")
+    else:
+        print(f"  {color}{'─' * (w - 4)}{C.RESET}")
+
+
+# ── Info row (dashboard-style) ───────────────────────────────────────────
+def print_info(label, value, color=C.WHITE, icon=""):
+    pfx = f"{icon} " if icon else "  "
+    print(f"  {C.GRAY}│{C.RESET} {pfx}{C.BOLD}{label:<14}{C.RESET} {C.GRAY}→{C.RESET}  {color}{value}{C.RESET}")
+
+
+# ── Status message ───────────────────────────────────────────────────────
+_STATUS_STYLE = {
+    "info": (C.BLUE,   "ℹ"),
+    "ok":   (C.GREEN,  "✔"),
+    "warn": (C.YELLOW, "⚠"),
+    "err":  (C.RED,    "✘"),
+    "wait": (C.CYAN,   "⏳"),
+}
+
+def print_status(msg, status="info", inline=False):
+    clr, ico = _STATUS_STYLE.get(status, _STATUS_STYLE["info"])
+    line = f"  {clr}{ico}{C.RESET}  {msg}"
+    if inline:
+        _inline(line)
+    else:
+        print(line)
+
+
+# ── Pipeline step (loading animation, no progress bar) ──────────────────
+_STEP_ICONS = ["◐", "◓", "◑", "◒"]
+_STEP_DONE  = "◉"
+
+def print_step(step_num, total, title):
+    """Print step header with spinning animation."""
+    _clear_inline()
+
+    # Brief spin animation (0.4s total)
+    for frame in range(4):
+        icon = _STEP_ICONS[frame % len(_STEP_ICONS)]
+        _inline(f"  {C.CYAN}{icon}{C.RESET}  {C.BOLD}Step {step_num}/{total}{C.RESET}  {C.DIM}{title}…{C.RESET}")
+        time.sleep(0.1)
+    _clear_inline()
+
+    # Final printed line
+    dots = f"{C.G1}{'●' * step_num}{C.GRAY}{'○' * (total - step_num)}{C.RESET}"
+    print(f"  {C.CYAN}{_STEP_DONE}{C.RESET}  {C.BOLD}Step {step_num}{C.GRAY}/{total}{C.RESET}  {dots}  {C.BOLD}{title}{C.RESET}")
+
+
+# ── Boxed content ────────────────────────────────────────────────────────
+def print_box(title, content_lines, border_color=C.CYAN):
+    w = W()
+    max_vis = max((len(_sa(l)) for l in content_lines), default=20)
+    bw = max(max_vis + 3, len(_sa(title)) + 4)
+    bw = min(bw, w - 6)
+
+    print()
+    print(f"  {_box_top(bw, border_color)}")
+    print(f"  {_box_row(f'{C.BOLD}{title}{C.RESET}', bw, border_color)}")
+    print(f"  {_box_mid(bw, border_color)}")
+    for line in content_lines:
+        print(f"  {_box_row(line, bw, border_color)}")
+    print(f"  {_box_bot(bw, border_color)}")
+
+
+# ── Animated spinner (blocking) ──────────────────────────────────────────
+_SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+def _spin_wait(msg, seconds):
+    """Show an inline spinner for `seconds`."""
+    end = time.time() + seconds
+    i = 0
+    while time.time() < end:
+        ch = _SPINNER[i % len(_SPINNER)]
+        _inline(f"  {C.CYAN}{ch}{C.RESET}  {C.DIM}{msg}{C.RESET}")
+        time.sleep(0.1)
+        i += 1
+    _clear_inline()
+
+
+# ── Open Notepad with 2FA info ───────────────────────────────────────────
+def _open_notepad_2fa(username, setup_key, recovery_codes):
+    """Write 2FA details to a temp file and open it in Notepad."""
+    codes_text = "\n".join(recovery_codes) if recovery_codes else t("tfa_codes_na")
+
+    content = (
+        f"*GitHub Students Dev Pack*\n"
+        f"Username: {username}\n"
+        f"Password: \n"
+        f"F2A: {setup_key}\n"
+        f"\n"
+        f"Recovery Codes:\n"
+        f"{codes_text}\n"
+        f"\n"
+        f"_dzulfikrialifajri store_\n"
+    )
+
+    try:
+        # Write to a temp .txt file
+        fd, path = tempfile.mkstemp(suffix=".txt", prefix=f"{username}_2fa_")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        # Open in Notepad (non-blocking)
+        if os.name == "nt":
+            subprocess.Popen(["notepad.exe", path],
+                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+        else:
+            # Fallback for non-Windows
+            subprocess.Popen(["xdg-open", path])
+    except Exception:
+        pass
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  STEP 1 — LOGIN VIA COOKIE
+# ══════════════════════════════════════════════════════════════════════════
+def do_login():
+    while True:
+        print_header(t("login_title"), "🔐")
+        print()
+        print(f"  {C.GRAY}{t('login_paste_hint')}{C.RESET}")
+        print(f"  {C.GRAY}{t('login_quit_hint')}{C.RESET}")
+        print()
+
+        try:
+            cookie = input(f"  {C.BOLD}{C.G1}❯ {C.RESET}").strip()
+        except (EOFError, KeyboardInterrupt):
+            print(f"\n  {C.YELLOW}Bye! 👋{C.RESET}")
+            sys.exit(0)
+
+        if cookie.lower() in ("quit", "exit", "q"):
+            print(f"\n  {C.YELLOW}{t('bye')}{C.RESET}")
+            sys.exit(0)
+
+        if not cookie:
+            print_status(t("login_empty"), "err")
+            continue
+
+        # ── Attempt login ──
+        _inline(f"  {C.CYAN}⏳{C.RESET}  {t('login_authenticating')}")
+        try:
+            session = core.login_with_cookie_str(cookie)
+            ok = core.is_logged_in(session)
+            _clear_inline()
+            if ok:
+                print_status(t("login_success"), "ok")
+                return session, cookie
+            else:
+                print_status(t("login_failed"), "err")
+                print()
+        except Exception as e:
+            _clear_inline()
+            print_status(t("login_error", error=e), "err")
+            print()
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  STEP 2 — CEK DETAIL USER
+# ══════════════════════════════════════════════════════════════════════════
+def check_user_details(session):
+    print_header(t("account_title"), "👤")
+    _inline(f"  {C.CYAN}⏳{C.RESET}  {t('fetching_profile')}")
+
+    info = core.get_profile_details(session)
+    _clear_inline()
+
+    username = info.get("username", "?")
+    name     = info.get("name", "—") or "—"
+    email    = info.get("email", "—") or "—"
+    age_days = info.get("age_days", 0)
+    created  = info.get("created", "")[:10]
+
+    # ── Dashboard card ──
+    w = W()
+    cw = min(w - 6, 52)
+    print()
+    print(f"  {_box_top(cw, C.G1)}")
+    print(f"  {_box_row(f'{C.BOLD}{C.LIME}@{username}{C.RESET}', cw, C.G1)}")
+    print(f"  {_box_mid(cw, C.G1)}")
+    print(f"  {_box_row(f'{C.GRAY}Name    {C.RESET} {name}', cw, C.G1)}")
+    print(f"  {_box_row(f'{C.GRAY}Email   {C.RESET} {email}', cw, C.G1)}")
+    ac = C.RED if age_days < 3 else (C.YELLOW if age_days < 7 else C.GREEN)
+    age_txt = f"{age_days} days ({created})" if created else f"{age_days} days"
+    print(f"  {_box_row(f'{C.GRAY}Age     {C.RESET} {ac}{age_txt}{C.RESET}', cw, C.G1)}")
+    print(f"  {_box_bot(cw, C.G1)}")
+    print()
+
+    if age_days < 3:
+        print_status(t("account_new_warn", days=age_days), "warn")
+
+    return info
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  STEP 3 — CEK & SETUP 2FA
+# ══════════════════════════════════════════════════════════════════════════
+def check_and_setup_2fa(session, username="unknown"):
+    print_header(t("tfa_title"), "🔒")
+    _inline(f"  {C.CYAN}⏳{C.RESET}  {t('tfa_checking')}")
+
+    tfa = False
+    try:
+        tfa = core.check_2fa_status(session)
+    except Exception as e:
+        _clear_inline()
+        print_status(t("tfa_check_failed", error=e), "err")
+
+    if tfa:
+        _clear_inline()
+        print_status(t("tfa_already_active"), "ok")
+        return True
+
+    _clear_inline()
+    print_status(t("tfa_not_active"), "warn")
+    print()
+
+    def on_log(msg):
+        important = any(k in msg for k in ("✅", "🔑", "💾", "⚠", "❌"))
+        if important:
+            _clear_inline()
+            print(f"    {C.GRAY}▸{C.RESET} {msg}")
+        else:
+            _inline(f"    {C.GRAY}▸{C.RESET} {msg}")
+
+    try:
+        result = core.setup_2fa(session, on_log=on_log)
+        _clear_inline()
+        print()
+
+        setup_key = result.get("setup_key", "")
+        recovery  = result.get("recovery_codes", [])
+        saved_to  = result.get("saved_to", "")
+
+        lines = [
+            f"{C.GREEN}Setup Key  {C.RESET} {C.BOLD}{C.LIME}{setup_key}{C.RESET}",
+        ]
+        if recovery:
+            lines.append(f"{C.YELLOW}Recovery Codes:{C.RESET}")
+            for i, code in enumerate(recovery, 1):
+                lines.append(f"  {C.GRAY}{i:2d}.{C.RESET} {code}")
+        if saved_to:
+            lines.append(f"{C.TEAL}File saved {C.RESET} {os.path.basename(saved_to)}")
+
+        print_box("🔐 2FA SETUP COMPLETE", lines, C.GREEN)
+        print()
+        print_status(t("tfa_setup_complete"), "ok")
+
+        # Copy setup key to clipboard
+        try:
+            if os.name == "nt":
+                subprocess.run(["clip"], input=setup_key.encode(), check=True,
+                               creationflags=subprocess.CREATE_NO_WINDOW)
+                print_status(t("tfa_clipboard"), "ok")
+        except Exception:
+            pass
+
+        # Open Notepad with 2FA details
+        _open_notepad_2fa(username, setup_key, recovery)
+        print_status(t("tfa_notepad"), "ok")
+
+        return True
+
+    except RuntimeError as e:
+        _clear_inline()
+        if "already enabled" in str(e).lower():
+            print_status(t("tfa_detected"), "ok")
+            return True
+        print_status(t("tfa_setup_failed", error=e), "err")
+        return False
+    except Exception as e:
+        _clear_inline()
+        print_status(t("tfa_setup_error", error=e), "err")
+        return False
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  STEP 4 — FULL AUTO PIPELINE
+# ══════════════════════════════════════════════════════════════════════════
+def run_full_auto(session):
+    print_header(t("pipeline_title"), "🚀")
+    print()
+
+    submit_ok = False
+    _schools = []
+
+    def on_step(n, title):
+        print_step(n, 8, title)
+
+    def on_log(msg, tag=""):
+        tag_clr = {
+            "ok": C.GREEN, "warn": C.YELLOW,
+            "err": C.RED,  "info": C.CYAN,
+        }
+        color = tag_clr.get(tag, C.WHITE)
+
+        # Capture school names for censoring
+        for pat in [
+            r'(?:Using selected|Auto-random|Auto-pick|Picked):\s*(.+?)(?:\s*\(ID:|$)',
+            r'School\s*:\s*(.+)',
+            r':\s*(.+?)\s*\(ID:\s*\d+',
+        ]:
+            m = re.search(pat, msg)
+            if m:
+                sn = m.group(1).strip().strip('\u2714').strip()
+                if sn and len(sn) > 3 and sn not in _schools:
+                    _schools.append(sn)
+
+        censored = _censor_text(msg, _schools)
+
+        is_result = tag in ("ok", "err", "warn") or msg.startswith("\n")
+        if is_result:
+            _clear_inline()
+            marker = {
+                "ok": f"{C.GREEN}✔", "warn": f"{C.YELLOW}!", "err": f"{C.RED}✘"
+            }.get(tag, f"{C.CYAN}·")
+            print(f"    {marker}{C.RESET}  {color}{censored}{C.RESET}")
+        else:
+            _inline(f"    {C.GRAY}·{C.RESET}  {color}{censored}{C.RESET}")
+
+    def on_sub(msg):
+        _inline(f"    {C.GRAY}›{C.RESET}  {C.DIM}{_censor_text(msg, _schools)}{C.RESET}")
+
+    def ask_use_existing(count):
+        _clear_inline()
+        print_status(t("pipeline_school_found", count=count), "ok")
+        return True
+
+    try:
+        pipe = core.AutoPipeline(
+            session,
+            on_step=on_step, on_log=on_log,
+            on_sub=on_sub, stop=lambda: False,
+            ask_use_existing=ask_use_existing,
+        )
+        pipe.run()
+        submit_ok = True
+    except Exception as e:
+        _clear_inline()
+        print()
+        print_status(f"ERROR: {e}", "err")
+
+    return submit_ok
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  STEP 5 — STATUS MONITOR  (refresh every 5 s)
+# ══════════════════════════════════════════════════════════════════════════
+def monitor_status(session):
+    print_header(t("monitor_title"), "📊")
+    print_status(t("monitor_watching"), "wait")
+    print_status(t("monitor_ctrlc"), "info")
+    print()
+
+    CARD = 10
+    first = True
+    n = 0
+
+    while True:
+        n += 1
+        now = datetime.now().strftime("%H:%M:%S")
+        _inline(f"  {C.CYAN}⏳{C.RESET}  Fetching… {C.GRAY}#{n}{C.RESET}")
+
+        try:
+            apps = core.get_benefits(session)
+        except Exception as e:
+            _inline(f"  {C.RED}✘{C.RESET}  Error: {e}")
+            time.sleep(5)
+            continue
+
+        if not apps:
+            _inline(f"  {C.YELLOW}·{C.RESET}  #{n} — {t('monitor_no_data')}")
+            time.sleep(5)
+            continue
+
+        app = apps[0]
+        status   = app.get("status", "Unknown")
+        subm     = app.get("submitted", "—")
+        atype    = app.get("type", "—")
+        appr_on  = app.get("approved_on", "")
+        expires  = app.get("expires", "")
+        message  = app.get("message", "")
+        progress = app.get("progress", "")
+
+        sl = status.lower()
+        if "approved" in sl:
+            sc, si, sb = C.GREEN, "✅", C.BG_SUCCESS
+        elif "pending" in sl or "review" in sl:
+            sc, si, sb = C.YELLOW, "⏳", C.BG_WARN
+        elif "rejected" in sl or "denied" in sl:
+            sc, si, sb = C.RED, "❌", C.BG_DANGER
+        else:
+            sc, si, sb = C.WHITE, "❓", C.BG_DARK
+
+        w = W()
+        lw = min(52, w - 8)
+
+        card = []
+        card.append(f"  {C.GRAY}{'─' * lw}{C.RESET}")
+        card.append(f"  {C.BOLD}⟳  {now}  {C.GRAY}refresh #{n}{C.RESET}")
+        card.append(f"  {C.GRAY}{'─' * lw}{C.RESET}")
+        card.append(f"  {si}  {sb} {sc}{C.BOLD} {status} {C.RESET}")
+        card.append(f"     {C.GRAY}Submitted {C.RESET}  {subm}")
+        card.append(f"     {C.GRAY}Type      {C.RESET}  {atype}")
+        if appr_on:
+            card.append(f"     {C.GRAY}Approved  {C.RESET}  {appr_on}")
+        if expires:
+            card.append(f"     {C.GRAY}Expires   {C.RESET}  {expires}")
+        if progress:
+            card.append(f"     {C.GRAY}Progress  {C.RESET}  {progress}")
+
+        while len(card) < CARD:
+            card.append("")
+
+        if not first:
+            sys.stdout.write(f"\033[{CARD + 1}A")
+        first = False
+
+        for line in card:
+            sys.stdout.write(f"\r{C.ERASE}{line}\n")
+        sys.stdout.write(f"\r{C.ERASE}")
+        sys.stdout.flush()
+
+        # ── Final statuses ──
+        if "approved" in sl:
+            print()
+            w2 = W()
+            msg_line = "🎉  A P P R O V E D  🎉"
+            grad_msg = _gradient(msg_line)
+            print(f"  {_gradient('═' * (w2 - 4))}")
+            pad_ = (w2 - len(msg_line) - 4) // 2
+            print(f"  {' ' * pad_}{grad_msg}")
+            print(f"  {_gradient('═' * (w2 - 4))}")
+            print()
+            return True
+
+        if "rejected" in sl or "denied" in sl:
+            print()
+            print(f"  {C.RED}{'═' * (W() - 4)}{C.RESET}")
+            print(f"  {C.RED}{C.BOLD}❌  D I T O L A K{C.RESET}")
+            if message:
+                print(f"  {C.GRAY}{t('monitor_rejected_reason', reason=message[:100])}{C.RESET}")
+            print(f"  {C.RED}{'═' * (W() - 4)}{C.RESET}")
+            print()
+            return True
+
+        # ── Countdown ──
+        try:
+            for r in range(5, 0, -1):
+                bar = f"{C.G1}{'●' * r}{C.GRAY}{'○' * (5 - r)}{C.RESET}"
+                _inline(f"  {bar}  {C.GRAY}next in {r}s{C.RESET}")
+                time.sleep(1)
+        except KeyboardInterrupt:
+            _clear_inline()
+            print(f"  {C.YELLOW}{t('monitor_stopped')}{C.RESET}")
+            return True
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  MAIN LOOP
+# ══════════════════════════════════════════════════════════════════════════
+def main():
+    enable_ansi_windows()
+
+    # Load language preference from settings
+    try:
+        cfg = core.load_settings()
+        lang = cfg.get("language", "id")
+        set_language(lang)
+    except Exception:
+        pass
+
+    while True:
+        clear_screen()
+        print_banner()
+
+        # Step 1
+        try:
+            session, cookie = do_login()
+        except KeyboardInterrupt:
+            print(f"\n\n  {C.YELLOW}Bye! 👋{C.RESET}\n")
+            break
+
+        # Step 2
+        try:
+            info = check_user_details(session)
+        except Exception as e:
+            print_status(t("failed_generic", error=e), "err")
+            input(f"\n  {C.GRAY}{t('press_enter')}{C.RESET}")
+            continue
+
+        # Step 3
+        try:
+            ok2 = check_and_setup_2fa(session, username=info.get("username", "unknown"))
+            if not ok2:
+                print_status(t("tfa_failed_continue"), "warn")
+        except KeyboardInterrupt:
+            print(f"\n  {C.YELLOW}{t('cancelled')}{C.RESET}")
+            input(f"\n  {C.GRAY}{t('press_enter')}{C.RESET}")
+            continue
+
+        # Step 4
+        try:
+            sok = run_full_auto(session)
+        except KeyboardInterrupt:
+            print(f"\n  {C.YELLOW}{t('stopped')}{C.RESET}")
+            input(f"\n  {C.GRAY}{t('press_enter')}{C.RESET}")
+            continue
+
+        # Step 5
+        if sok:
+            try:
+                monitor_status(session)
+            except KeyboardInterrupt:
+                print(f"\n  {C.YELLOW}{t('monitor_stopped')}{C.RESET}")
+        else:
+            print()
+            print_status(t("submit_failed"), "err")
+
+        # ── Back to login ──
+        print()
+        print_divider(t("done_label"))
+        print(f"  {C.BOLD}{C.CYAN}{t('back_to_login')}{C.RESET}")
+        print_divider()
+        input(f"\n  {C.GRAY}{t('press_enter')}{C.RESET}")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(f"\n\n  {C.YELLOW}{t('bye')}{C.RESET}\n")
+    except Exception as e:
+        print(f"\n  {C.RED}{t('fatal_error', error=e)}{C.RESET}")
+        input(f"\n  {t('press_enter_exit')}")

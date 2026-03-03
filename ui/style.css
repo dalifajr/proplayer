@@ -1,0 +1,430 @@
+/* ═════════════════════════════════════════════════════════════════════
+   Material You (M3) — Light Theme Design System
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* ── M3 Color Tokens (CSS Custom Properties) ─────────────────────── */
+:root {
+  /* Primary (Blue seed) */
+  --md-primary:            #1565C0;
+  --md-on-primary:         #FFFFFF;
+  --md-primary-container:  #D4E3FF;
+  --md-on-primary-container: #001B3D;
+
+  /* Secondary */
+  --md-secondary:            #555F71;
+  --md-on-secondary:         #FFFFFF;
+  --md-secondary-container:  #D9E3F5;
+  --md-on-secondary-container: #121C2B;
+
+  /* Tertiary (green accent) */
+  --md-tertiary:            #2E7D4F;
+  --md-on-tertiary:         #FFFFFF;
+  --md-tertiary-container:  #B8F1CB;
+  --md-on-tertiary-container: #002112;
+
+  /* Error */
+  --md-error:            #BA1A1A;
+  --md-on-error:         #FFFFFF;
+  --md-error-container:  #FFDAD6;
+  --md-on-error-container: #410002;
+
+  /* Surfaces */
+  --md-surface:               #F8F9FF;
+  --md-surface-dim:           #D8DAE0;
+  --md-surface-bright:        #F8F9FF;
+  --md-surface-container-lowest: #FFFFFF;
+  --md-surface-container-low: #F2F3FA;
+  --md-surface-container:     #ECEDF4;
+  --md-surface-container-high:#E6E8EF;
+  --md-surface-container-highest: #E1E2E9;
+
+  /* On Surface */
+  --md-on-surface:         #191C20;
+  --md-on-surface-variant:  #43474E;
+
+  /* Outline */
+  --md-outline:         #73777F;
+  --md-outline-variant: #C3C6CF;
+
+  /* Inverse */
+  --md-inverse-surface:    #2E3036;
+  --md-inverse-on-surface: #EFF0F7;
+  --md-inverse-primary:    #A6C8FF;
+
+  /* Additional */
+  --md-shadow: rgba(0, 0, 0, 0.08);
+  --md-scrim:  rgba(0, 0, 0, 0.32);
+}
+
+/* ── Base Styles ──────────────────────────────────────────────────── */
+body {
+  background-color: var(--md-surface);
+  color: var(--md-on-surface);
+  font-family: 'Google Sans', 'Segoe UI', 'Roboto', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── M3 Cards (Surface Container) ──────────────────────────────────── */
+.card {
+  background: var(--md-surface-container-lowest);
+  border-radius: 28px;
+  padding: 20px 20px 16px;
+  border: none;
+  box-shadow: 0 1px 3px var(--md-shadow), 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 2px 8px var(--md-shadow), 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.015em;
+  color: var(--md-primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--md-outline-variant);
+}
+
+/* ── Labels ───────────────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  margin-top: 8px;
+  margin-bottom: 2px;
+  letter-spacing: 0.02em;
+}
+
+/* ── M3 Text Fields (Filled style) ─────────────────────────────────── */
+.inp {
+  width: 100%;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  outline: none;
+  background: var(--md-surface-container-high);
+  border: 1.5px solid transparent;
+  color: var(--md-on-surface);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.inp::placeholder {
+  color: var(--md-outline);
+}
+.inp:hover {
+  background: var(--md-surface-container-highest);
+}
+.inp:focus {
+  border-color: var(--md-primary);
+  background: var(--md-surface-container-low);
+  box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.12);
+}
+
+/* ── M3 Buttons ───────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;        /* M3: full-rounded (pill) */
+  padding: 10px 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  position: relative;
+  overflow: hidden;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Filled Button (Primary) */
+.btn-primary {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: 0 1px 3px rgba(21, 101, 192, 0.24), 0 1px 2px rgba(0,0,0,0.08);
+}
+.btn-primary:hover {
+  box-shadow: 0 2px 6px rgba(21, 101, 192, 0.32), 0 1px 3px rgba(0,0,0,0.1);
+  filter: brightness(1.08);
+}
+
+/* Tonal Button (Green/Tertiary) */
+.btn-green {
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.btn-green:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  filter: brightness(0.97);
+}
+
+/* Error Tonal Button */
+.btn-danger {
+  background: var(--md-error-container);
+  color: var(--md-on-error-container);
+}
+.btn-danger:hover {
+  filter: brightness(0.96);
+}
+
+/* Tonal Button (Secondary — ghost replacement) */
+.btn-ghost {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+.btn-ghost:hover {
+  filter: brightness(0.96);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* ── Info Grid ─────────────────────────────────────────────────────── */
+.info-grid { display: flex; flex-direction: column; gap: 2px; }
+.info-row {
+  display: flex;
+  font-size: 0.875rem;
+  padding: 6px 4px;
+  border-radius: 12px;
+  transition: background 0.15s ease;
+}
+.info-row:hover {
+  background: var(--md-surface-container-low);
+}
+.info-k {
+  width: 130px;
+  flex-shrink: 0;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+}
+.info-v {
+  flex: 1;
+  word-break: break-all;
+  color: var(--md-on-surface);
+}
+
+/* ── M3 Progress Indicator (Linear) ───────────────────────────────── */
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: var(--md-surface-container-highest);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--md-primary);
+  border-radius: 100px;
+  transition: width 0.5s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ── Log Box (Surface Container) ───────────────────────────────────── */
+.log-box {
+  width: 100%;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+  line-height: 1.65;
+  background: var(--md-surface-container);
+  border: 1px solid var(--md-outline-variant);
+  color: var(--md-on-surface);
+  max-height: 288px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Page Section Titles ───────────────────────────────────────────── */
+.page h1 {
+  color: var(--md-on-surface);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ── Page Transitions (M3 motion) ──────────────────────────────────── */
+.page {
+  animation: m3FadeUp 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes m3FadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modal (M3 Dialog) ─────────────────────────────────────────────── */
+.animate-modal {
+  animation: m3DialogIn 0.3s cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+@keyframes m3DialogIn {
+  from { opacity: 0; transform: scale(0.85) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Toast (M3 Snackbar) ───────────────────────────────────────────── */
+.toast-show {
+  opacity: 1 !important;
+  transform: translate(-50%, 0) !important;
+  pointer-events: auto !important;
+}
+
+/* ── List Items (session / school items) ───────────────────────────── */
+.list-item {
+  padding: 10px 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--md-on-surface);
+  transition: background 0.15s ease;
+  border: 1.5px solid transparent;
+}
+.list-item:hover {
+  background: var(--md-surface-container-high);
+}
+.list-item.active {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-color: var(--md-primary);
+}
+
+/* ── M3 Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--md-outline-variant);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-outline);
+}
+
+/* ── M3 Select dropdown ────────────────────────────────────────────── */
+select.inp {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2343474E' viewBox='0 0 16 16'%3E%3Cpath d='M4.94 5.72a.75.75 0 0 1 1.06 0L8 7.78l2-.06a.75.75 0 1 1 1.06 1.06l-2.53 2.53a.75.75 0 0 1-1.06 0L4.94 6.78a.75.75 0 0 1 0-1.06z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* ── M3 Radio buttons ──────────────────────────────────────────────── */
+input[type="radio"] {
+  accent-color: var(--md-primary);
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Utility text colors using M3 tokens ───────────────────────────── */
+.text-m3-primary     { color: var(--md-primary) !important; }
+.text-m3-error       { color: var(--md-error) !important; }
+.text-m3-tertiary    { color: var(--md-tertiary) !important; }
+.text-m3-outline     { color: var(--md-outline) !important; }
+.text-m3-on-surface  { color: var(--md-on-surface) !important; }
+.text-m3-on-surface-v{ color: var(--md-on-surface-variant) !important; }
+.bg-m3-error-container { background: var(--md-error-container) !important; }
+.bg-m3-tertiary-container { background: var(--md-tertiary-container) !important; }
+.bg-m3-primary-container  { background: var(--md-primary-container) !important; }
+
+/* ═════════════════════════════════════════════════════════════════════
+   Material You (M3) — Dark Theme
+   ═════════════════════════════════════════════════════════════════════ */
+.dark {
+  /* Primary (Blue seed — dark) */
+  --md-primary:            #A6C8FF;
+  --md-on-primary:         #003063;
+  --md-primary-container:  #00468B;
+  --md-on-primary-container: #D4E3FF;
+
+  /* Secondary */
+  --md-secondary:            #BDC7DC;
+  --md-on-secondary:         #273141;
+  --md-secondary-container:  #3D4758;
+  --md-on-secondary-container: #D9E3F5;
+
+  /* Tertiary (green accent — dark) */
+  --md-tertiary:            #9CD5AF;
+  --md-on-tertiary:         #003822;
+  --md-tertiary-container:  #0C5133;
+  --md-on-tertiary-container: #B8F1CB;
+
+  /* Error */
+  --md-error:            #FFB4AB;
+  --md-on-error:         #690005;
+  --md-error-container:  #93000A;
+  --md-on-error-container: #FFDAD6;
+
+  /* Surfaces (dark) */
+  --md-surface:               #111318;
+  --md-surface-dim:           #111318;
+  --md-surface-bright:        #37393E;
+  --md-surface-container-lowest: #0C0E13;
+  --md-surface-container-low: #191C20;
+  --md-surface-container:     #1D2024;
+  --md-surface-container-high:#282A2F;
+  --md-surface-container-highest: #32353A;
+
+  /* On Surface (dark) */
+  --md-on-surface:         #E1E2E9;
+  --md-on-surface-variant:  #C3C6CF;
+
+  /* Outline (dark) */
+  --md-outline:         #8D9199;
+  --md-outline-variant: #43474E;
+
+  /* Inverse (dark) */
+  --md-inverse-surface:    #E1E2E9;
+  --md-inverse-on-surface: #2E3036;
+  --md-inverse-primary:    #1565C0;
+
+  /* Additional (dark) */
+  --md-shadow: rgba(0, 0, 0, 0.3);
+  --md-scrim:  rgba(0, 0, 0, 0.6);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--md-outline);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--md-on-surface-variant);
+}
+
+/* Dark mode select dropdown arrow */
+.dark select.inp {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23C3C6CF' viewBox='0 0 16 16'%3E%3Cpath d='M4.94 5.72a.75.75 0 0 1 1.06 0L8 7.78l2-.06a.75.75 0 1 1 1.06 1.06l-2.53 2.53a.75.75 0 0 1-1.06 0L4.94 6.78a.75.75 0 0 1 0-1.06z'/%3E%3C/svg%3E");
+}
+
+/* ── Loading Spinner ───────────────────────────────────────────────── */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--md-outline-variant);
+  border-top-color: var(--md-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Input Error State ─────────────────────────────────────────────── */
+.inp-error {
+  border-color: var(--md-error) !important;
+  background-color: var(--md-error-container) !important;
+}
+
+.inp-error:focus {
+  outline-color: var(--md-error) !important;
+}
+
+.field-error {
+  display: block;
+  color: var(--md-error);
+  font-size: 0.75rem;
+  margin-top: 2px;
+}

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Edu Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Google Sans', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen font-sans">
+
+  <!-- ══ Top Bar (M3 Small Top App Bar) ══ -->
+  <header style="background:var(--md-surface); border-bottom:1px solid var(--md-outline-variant);" class="sticky top-0 z-50 px-4 py-2.5 flex items-center gap-3 select-none">
+    <button id="btn-back" onclick="goBack()" class="hidden text-sm px-3 py-2 rounded-full transition" style="color:var(--md-on-surface);" onmouseover="this.style.background='var(--md-surface-container-high)'" onmouseout="this.style.background='transparent'" data-i18n="ui_back">&#9666; Back</button>
+    <span class="text-base font-bold tracking-tight flex-1" style="color:var(--md-on-surface);">GitHub Edu Pro</span>
+    <span id="status-bar" class="text-xs font-medium" style="color:var(--md-primary);" data-i18n="ui_not_logged_in">Not logged in</span>
+    <button id="btn-theme" onclick="toggleTheme()" class="text-lg px-2 py-1 rounded-full transition" style="color:var(--md-on-surface);" onmouseover="this.style.background='var(--md-surface-container-high)'" onmouseout="this.style.background='transparent'" title="Toggle theme">&#9728;</button>
+    <button id="btn-logout" onclick="doLogout()" class="hidden text-xs px-4 py-2 rounded-full font-medium transition" style="background:var(--md-error-container); color:var(--md-on-error-container);" data-i18n="ui_logout">&#9211; Logout</button>
+  </header>
+
+  <!-- ══ Page Container ══ -->
+  <main id="app" class="max-w-2xl mx-auto px-4 pb-16 pt-3">
+
+    <!-- ───── LOGIN ───── -->
+    <section id="page-login" class="page space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128274; Sign In</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#127850; Login with Cookies</h2>
+        <label class="label">Paste cookie string (a=b; c=d)</label>
+        <input id="inp-cookie" type="text" class="inp" placeholder="user_session=abc; __Host-user=..." />
+        <button onclick="loginCookie()" class="btn btn-primary mt-3">LOGIN WITH COOKIES</button>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128273; Login with Password</h2>
+        <label class="label">Username or Email</label>
+        <input id="inp-user" type="text" class="inp" />
+        <label class="label mt-2">Password</label>
+        <input id="inp-pass" type="password" class="inp" />
+        <button onclick="loginPassword()" class="btn btn-primary mt-3">LOGIN WITH PASSWORD</button>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128193; Saved Sessions</h2>
+        <button onclick="nav('sessions')" class="btn btn-ghost">OPEN SESSION MANAGER</button>
+      </div>
+    </section>
+
+    <!-- ───── DASHBOARD ───── -->
+    <section id="page-action" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#9889; Dashboard</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#128100; Account Overview</h2>
+        <div class="info-grid">
+          <div class="info-row"><span class="info-k">Username</span><span id="d-user" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Name</span><span id="d-name" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Email</span><span id="d-email" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Account Age</span><span id="d-age" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">2FA</span><span id="d-tfa" class="info-v">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#127919; Quick Actions</h2>
+        <div class="grid grid-cols-2 gap-2.5 mt-2">
+          <button onclick="startFullAuto()"     class="btn btn-primary text-sm py-3">&#128640; Full Auto</button>
+          <button onclick="nav('search')"       class="btn btn-ghost text-sm py-3">&#128269; Search Schools</button>
+          <button onclick="nav('edit_profile')" class="btn btn-ghost text-sm py-3">&#9999;&#65039; Edit Profile</button>
+          <button onclick="nav('billing')"      class="btn btn-ghost text-sm py-3">&#128179; Edit Billing</button>
+          <button onclick="openProfile()"       class="btn btn-ghost text-sm py-3">&#128100; Account Detail</button>
+          <button onclick="openBenefits()"      class="btn btn-ghost text-sm py-3">&#128203; Benefits List</button>
+          <button onclick="openTfa()"           class="btn btn-ghost text-sm py-3">&#128274; Setup 2FA</button>
+          <button onclick="nav('sessions')"     class="btn btn-ghost text-sm py-3">&#128193; Sessions</button>
+          <button onclick="refreshDashboard()"  class="btn btn-ghost text-sm py-3">&#128260; Refresh</button>
+          <button onclick="nav('settings')"     class="btn btn-ghost text-sm py-3">&#9881;&#65039; Settings</button>
+          <button onclick="nav('history')"      class="btn btn-ghost text-sm py-3">&#128218; History</button>
+          <button onclick="nav('logs')"         class="btn btn-ghost text-sm py-3">&#128220; View Logs</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── SEARCH ───── -->
+    <section id="page-search" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128269; School Search</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#9881;&#65039; Search Options</h2>
+        <label class="label">Manual keyword (leave empty for auto)</label>
+        <input id="inp-search-q" type="text" class="inp" />
+        <div class="flex gap-2 mt-3">
+          <button onclick="manualSearch()"  class="btn btn-primary text-sm flex-1">&#128269; MANUAL</button>
+          <button onclick="autoSearch()"    class="btn btn-ghost text-sm flex-1">&#9889; AUTO ALL</button>
+          <button onclick="stopAction()"    class="btn btn-danger text-sm">&#11036; STOP</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128202; Progress</h2>
+        <p id="s-status" class="text-sm" style="color:var(--md-on-surface-variant)">Ready</p>
+        <div class="progress-track mt-2"><div id="s-bar" class="progress-bar" style="width:0%"></div></div>
+        <p id="s-count" class="text-sm font-semibold mt-2" style="color:var(--md-on-surface)">Found: 0 | Qualified: 0</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#127979; Qualifying Schools</h2>
+        <ul id="s-results" class="space-y-1.5 text-sm max-h-64 overflow-y-auto px-1"></ul>
+        <p id="s-info" class="text-xs mt-2" style="color:var(--md-outline)"></p>
+      </div>
+    </section>
+
+    <!-- ───── AUTO ───── -->
+    <section id="page-auto" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128640; Full Auto Mode</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#128205; Spoof Coordinates</h2>
+        <div class="flex gap-3 items-center">
+          <label class="text-sm font-medium" style="color:var(--md-on-surface-variant)">Lat:</label>
+          <input id="auto-lat" type="text" class="inp flex-1" value="-2.9761" />
+          <label class="text-sm font-medium" style="color:var(--md-on-surface-variant)">Lon:</label>
+          <input id="auto-lon" type="text" class="inp flex-1" value="104.7754" />
+        </div>
+        <p class="text-xs mt-1.5" style="color:var(--md-outline)">Default: Palembang. Change for custom spoofing.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#127979; School Selection</h2>
+        <div class="flex gap-2">
+          <select id="auto-school" class="inp flex-1">
+            <option value="">&#9889; Auto (random)</option>
+          </select>
+          <button onclick="refreshSchoolDropdown()" class="btn btn-ghost text-sm">&#128260;</button>
+        </div>
+        <p class="text-xs mt-1.5" style="color:var(--md-outline)">Refresh loads from daftar_sekolah.txt. "Auto" picks randomly.</p>
+        <div class="flex gap-2 mt-3 items-center">
+          <label class="text-sm font-medium" style="color:var(--md-on-surface-variant)">&#128247; Camera Filter:</label>
+          <select id="auto-cam-filter" class="inp flex-1">
+            <option value="">All schools (no filter)</option>
+            <option value="true">cam:true — camera required</option>
+            <option value="false">cam:false — upload only</option>
+          </select>
+        </div>
+        <p class="text-xs mt-1.5" style="color:var(--md-outline)">Filter schools by camera requirement before auto-pick.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128202; Progress</h2>
+        <p id="a-step" class="text-sm font-bold" style="color:var(--md-on-surface)">Ready</p>
+        <div class="progress-track mt-2"><div id="a-bar" class="progress-bar" style="width:0%"></div></div>
+        <p id="a-sub" class="text-xs mt-1.5" style="color:var(--md-outline)"></p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128220; Activity Log</h2>
+        <pre id="a-log" class="log-box"></pre>
+        <div class="flex justify-end gap-2 mt-3">
+          <button onclick="stopAction()"  class="btn btn-danger text-sm">&#11036; FORCE STOP</button>
+          <button onclick="runAuto()"     class="btn btn-green text-sm">&#9654; START</button>
+        </div>
+      </div>
+
+      <!-- 2FA result card — shown only when 2FA is set up during pipeline -->
+      <div id="a-tfa-result" class="card hidden space-y-2">
+        <h2 class="card-title">&#128274; 2FA Configured</h2>
+        <div class="info-row"><span class="info-k">Setup Key</span><span id="a-tfa-key" class="info-v font-mono font-bold" style="color:var(--md-tertiary);">—</span></div>
+        <p class="text-sm font-semibold mt-2 mb-1" style="color:var(--md-on-surface-variant);">Recovery Codes:</p>
+        <pre id="a-tfa-codes" class="log-box font-mono text-xs" style="min-height:80px;"></pre>
+        <p id="a-tfa-file" class="text-xs" style="color:var(--md-outline);"></p>
+        <button onclick="safeClipboard($('a-tfa-key').textContent, 'Key')" class="btn btn-ghost text-sm mt-1">&#128203; Copy Key</button>
+      </div>
+
+      <!-- Live Status Monitor — shown after pipeline completes -->
+      <div id="a-monitor" class="card hidden space-y-2">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title mb-0">&#128225; Live Status Monitor</h2>
+          <span id="a-mon-tick" class="text-xs" style="color:var(--md-outline);"></span>
+        </div>
+        <p id="a-mon-status" class="text-sm font-bold" style="color:var(--md-on-surface-variant);">Waiting...</p>
+        <div class="info-grid">
+          <div class="info-row"><span class="info-k">Submitted</span><span id="a-mon-submitted" class="info-v">&#8212;</span></div>
+          <div class="info-row"><span class="info-k">Type</span><span id="a-mon-type" class="info-v">&#8212;</span></div>
+          <div class="info-row"><span class="info-k">Approved</span><span id="a-mon-approved" class="info-v">&#8212;</span></div>
+          <div class="info-row"><span class="info-k">Expires</span><span id="a-mon-expires" class="info-v">&#8212;</span></div>
+        </div>
+        <button onclick="stopMonitor()" class="btn btn-ghost text-sm mt-1">&#9646;&#9646; Stop Monitor</button>
+      </div>
+    </section>
+
+    <!-- ───── SESSIONS ───── -->
+    <section id="page-sessions" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128193; Session Manager</h1>
+      <div class="card">
+        <h2 class="card-title">&#128190; Saved Sessions</h2>
+        <ul id="sess-list" class="space-y-1.5 text-sm max-h-64 overflow-y-auto"></ul>
+        <div class="flex gap-2 mt-3">
+          <button onclick="useSession()"    class="btn btn-primary text-sm">&#10004; USE SELECTED</button>
+          <button onclick="deleteSession()" class="btn btn-danger text-sm">&#128465; DELETE</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── BILLING ───── -->
+    <section id="page-billing" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128179; Edit Billing Address</h1>
+
+      <div class="card">
+        <p id="bill-status" class="text-sm font-medium" style="color:var(--md-primary)">Loading...</p>
+      </div>
+
+      <div class="card space-y-1">
+        <h2 class="card-title">&#128221; Billing Details</h2>
+        <label class="label">First Name</label><input id="bill-first" class="inp" />
+        <label class="label">Last Name</label><input id="bill-last" class="inp" />
+        <label class="label">Address Line 1</label><input id="bill-addr1" class="inp" />
+        <label class="label">Address Line 2</label><input id="bill-addr2" class="inp" />
+        <label class="label">City</label><input id="bill-city" class="inp" />
+        <label class="label">Region / Province</label><input id="bill-region" class="inp" />
+        <label class="label">Postal Code</label><input id="bill-postal" class="inp" />
+        <label class="label">Country Code</label><input id="bill-country" class="inp" />
+        <div class="flex gap-2 mt-4">
+          <button onclick="saveBilling()" class="btn btn-green text-sm">&#128190; SAVE BILLING</button>
+          <button onclick="loadBilling()" class="btn btn-ghost text-sm">&#128260; RELOAD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── PROFILE (read-only) ───── -->
+    <section id="page-profile" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128100; Account Detail</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#128203; Profile Information</h2>
+        <div class="info-grid" id="prof-info">
+          <div class="info-row"><span class="info-k">Username</span><span id="p-username" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Name</span><span id="p-name" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Email</span><span id="p-email" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Account Age</span><span id="p-age" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Created</span><span id="p-created" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Bio</span><span id="p-bio" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Company</span><span id="p-company" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Location</span><span id="p-location" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Website</span><span id="p-website" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Public Repos</span><span id="p-repos" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Followers</span><span id="p-followers" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Following</span><span id="p-following" class="info-v">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128179; Billing Address</h2>
+        <div class="info-grid" id="prof-billing">
+          <div class="info-row"><span class="info-k">First Name</span><span id="pb-first" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Last Name</span><span id="pb-last" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Address</span><span id="pb-addr1" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Address 2</span><span id="pb-addr2" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">City</span><span id="pb-city" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Region</span><span id="pb-region" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Postal Code</span><span id="pb-postal" class="info-v">—</span></div>
+          <div class="info-row"><span class="info-k">Country</span><span id="pb-country" class="info-v">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128274; Two-Factor Authentication</h2>
+        <p id="p-2fa" class="text-sm font-bold" style="color:var(--md-on-surface-variant)">Checking...</p>
+        <div class="flex gap-2 mt-3">
+          <button onclick="openProfile()"              class="btn btn-ghost text-sm">&#128260; REFRESH</button>
+          <button onclick="nav('edit_profile')"        class="btn btn-ghost text-sm">&#9999;&#65039; EDIT PROFILE</button>
+          <button onclick="nav('billing')"             class="btn btn-ghost text-sm">&#128179; EDIT BILLING</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── EDIT PROFILE ───── -->
+    <section id="page-edit_profile" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#9999;&#65039; Edit Profile</h1>
+
+      <div class="card">
+        <p id="prof-edit-status" class="text-sm font-medium" style="color:var(--md-primary)">Loading...</p>
+      </div>
+
+      <div class="card space-y-1">
+        <h2 class="card-title">&#128100; Profile Details</h2>
+        <label class="label">Display Name</label><input id="pf-name" class="inp" />
+        <label class="label">Public Email</label><input id="pf-email" class="inp" />
+        <label class="label">Bio</label><input id="pf-bio" class="inp" />
+        <label class="label">Pronouns</label><input id="pf-pronouns" class="inp" />
+        <label class="label">Website / URL</label><input id="pf-website" class="inp" />
+        <label class="label">Company</label><input id="pf-company" class="inp" />
+        <label class="label">Location</label><input id="pf-location" class="inp" />
+        <div class="flex gap-2 mt-4">
+          <button onclick="saveProfile()" class="btn btn-green text-sm">&#128190; UPDATE PROFILE</button>
+          <button onclick="loadProfileForm()" class="btn btn-ghost text-sm">&#128260; RELOAD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── BENEFITS ───── -->
+    <section id="page-benefits" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128203; Benefit Applications</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#128202; Summary</h2>
+        <p id="ben-summary" class="text-sm font-bold" style="color:var(--md-on-surface)">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128230; Applications</h2>
+        <ul id="ben-list" class="space-y-1.5 text-sm max-h-48 overflow-y-auto"></ul>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128196; Detail</h2>
+        <pre id="ben-detail" class="log-box text-xs" style="min-height:120px"></pre>
+        <button onclick="openBenefits()" class="btn btn-ghost text-sm mt-3">&#128260; REFRESH</button>
+      </div>
+    </section>
+
+    <!-- ───── 2FA ───── -->
+    <section id="page-tfa" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128274; 2FA Setup</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#128225; Status</h2>
+        <p id="tfa-status" class="text-sm font-bold" style="color:var(--md-on-surface-variant)">Checking...</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128220; Setup Log</h2>
+        <pre id="tfa-log" class="log-box"></pre>
+        <div class="flex justify-end mt-3">
+          <button id="tfa-start-btn" onclick="runTfaSetup()" class="btn btn-green text-sm">&#9654; AUTO SETUP 2FA</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128203; Results</h2>
+        <p id="tfa-key" class="text-sm font-bold" style="color:var(--md-on-surface)">Setup Key: —</p>
+        <p class="text-sm font-semibold mt-3 mb-1" style="color:var(--md-on-surface-variant)">Recovery Codes:</p>
+        <pre id="tfa-codes" class="log-box font-mono text-xs" style="min-height:120px">No data yet — run setup first.</pre>
+        <p id="tfa-file" class="text-xs mt-1.5" style="color:var(--md-outline)"></p>
+        <div class="flex gap-2 mt-3">
+          <button id="tfa-open-btn" onclick="openTfaFile()" class="btn btn-ghost text-sm opacity-50 pointer-events-none">&#128194; Open File</button>
+          <button id="tfa-copy-btn" onclick="copyTfaClip()" class="btn btn-ghost text-sm hidden">&#128203; Copy Again</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── SETTINGS ───── -->
+    <section id="page-settings" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#9881;&#65039; Settings</h1>
+
+      <div class="card">
+        <p id="sett-status" class="text-sm font-medium"></p>
+      </div>
+
+      <div class="card space-y-1">
+        <h2 class="card-title">&#128205; Default Address</h2>
+        <label class="label">Address</label><input id="s-address" class="inp" />
+        <label class="label">City</label><input id="s-city" class="inp" />
+        <label class="label">Region</label><input id="s-region" class="inp" />
+        <label class="label">Postal Code</label><input id="s-postal" class="inp" />
+        <label class="label">Country Code</label><input id="s-country" class="inp" />
+      </div>
+
+      <div class="card space-y-1">
+        <h2 class="card-title">&#127757; Default Coordinates</h2>
+        <label class="label">Latitude</label><input id="s-lat" class="inp" />
+        <label class="label">Longitude</label><input id="s-lon" class="inp" />
+      </div>
+
+      <div class="card space-y-1">
+        <h2 class="card-title">&#9889; Automation</h2>
+        <label class="label">Document Label</label><input id="s-doclabel" class="inp" />
+        <label class="label">Search Delay (sec)</label><input id="s-delay" class="inp" />
+        <label class="label">ID Validity (days)</label><input id="s-validity" class="inp" />
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#127912; Appearance</h2>
+        <div class="flex items-center gap-5 mt-1">
+          <span class="text-sm font-medium" style="color:var(--md-on-surface-variant)">Theme:</span>
+          <label class="flex items-center gap-2 cursor-pointer text-sm">
+            <input type="radio" name="theme" value="light" checked /> &#9728; Light
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-sm">
+            <input type="radio" name="theme" value="dark" /> &#127769; Dark
+          </label>
+        </div>
+        <div class="flex items-center gap-5 mt-3">
+          <span class="text-sm font-medium" style="color:var(--md-on-surface-variant)">Language:</span>
+          <label class="flex items-center gap-2 cursor-pointer text-sm">
+            <input type="radio" name="language" value="id" checked /> &#127470;&#127465; Indonesian
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-sm">
+            <input type="radio" name="language" value="en" /> &#127468;&#127463; English
+          </label>
+        </div>
+        <p class="text-xs mt-1.5" style="color:var(--md-outline)">Theme takes effect immediately. Language applies to GUI and CLI.</p>
+      </div>
+
+      <div class="card space-y-3">
+        <h2 class="card-title">&#128193; Data Files</h2>
+
+        <div>
+          <label class="label">School List (daftar_sekolah.txt)</label>
+          <p id="file-school-info" class="text-xs mb-1.5" style="color:var(--md-on-surface-variant)">Loading...</p>
+          <button onclick="uploadSchoolList()" class="btn btn-ghost text-sm">&#128194; Upload daftar_sekolah.txt</button>
+        </div>
+
+        <div>
+          <label class="label">Keywords (keywords.txt)</label>
+          <p id="file-kw-info" class="text-xs mb-1.5" style="color:var(--md-on-surface-variant)">Loading...</p>
+          <button onclick="uploadKeywords()" class="btn btn-ghost text-sm">&#128194; Upload keywords.txt</button>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="saveSettings()" class="btn btn-green text-sm">&#128190; SAVE SETTINGS</button>
+        <button onclick="loadSettings()" class="btn btn-ghost text-sm">&#128260; RELOAD</button>
+      </div>
+    </section>
+
+    <!-- ───── HISTORY ───── -->
+    <section id="page-history" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128218; Submission History</h1>
+
+      <div class="card">
+        <h2 class="card-title">&#128202; Summary</h2>
+        <p id="hist-summary" class="text-sm font-bold" style="color:var(--md-on-surface);">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128203; Records</h2>
+        <ul id="hist-list" class="space-y-1.5 text-sm max-h-72 overflow-y-auto"></ul>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">&#128196; Detail</h2>
+        <pre id="hist-detail" class="log-box text-xs" style="min-height:100px;"></pre>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="loadHistory()"   class="btn btn-ghost text-sm">&#128260; Refresh</button>
+        <button onclick="clearHistory()"  class="btn btn-danger text-sm">&#128465; Clear History</button>
+      </div>
+    </section>
+
+    <!-- ───── LOGS ───── -->
+    <section id="page-logs" class="page hidden space-y-4">
+      <h1 class="text-xl font-bold mt-4">&#128220; Application Log</h1>
+      <div class="card">
+        <h2 class="card-title">&#128196; gh_edu.log</h2>
+        <pre id="log-box" class="log-box text-xs" style="max-height:500px"></pre>
+        <div class="flex gap-2 mt-3">
+          <button onclick="refreshLogs()" class="btn btn-ghost text-sm">&#128260; Refresh</button>
+          <button onclick="clearLogs()"   class="btn btn-danger text-sm">&#128465; Clear Log</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══ Modal (M3 Dialog) ══ -->
+  <div id="modal-overlay" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:var(--md-scrim);">
+    <div class="w-full max-w-sm mx-4 p-6 space-y-4 animate-modal" style="background:var(--md-surface-container-highest); border-radius:28px; box-shadow: 0 8px 32px rgba(0,0,0,0.18);">
+      <h3 id="modal-title" class="font-bold text-lg" style="color:var(--md-on-surface)"></h3>
+      <p  id="modal-body"  class="text-sm" style="color:var(--md-on-surface-variant)"></p>
+      <input id="modal-input" type="text" class="inp hidden" />
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="modal-cancel" class="btn btn-ghost text-sm" data-i18n="ui_cancel">Cancel</button>
+        <button id="modal-ok"     class="btn btn-primary text-sm" data-i18n="ui_ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Loading Overlay ══ -->
+  <div id="loading-overlay" class="fixed inset-0 z-[120] hidden items-center justify-center" style="background:var(--md-scrim);">
+    <div class="flex flex-col items-center gap-3 p-6 rounded-3xl" style="background:var(--md-surface-container-highest);">
+      <div class="loading-spinner"></div>
+      <span class="text-sm font-medium" style="color:var(--md-on-surface);" data-i18n="ui_loading">Loading...</span>
+    </div>
+  </div>
+
+  <!-- ══ Toast (M3 Snackbar) ══ -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] px-6 py-3 text-sm font-medium shadow-xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none" style="border-radius:16px; background:var(--md-inverse-surface); color:var(--md-inverse-on-surface);"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

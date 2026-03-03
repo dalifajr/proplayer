@@ -1,0 +1,39 @@
+# ── Sensitive / user-specific ──
+cookies.txt
+sessions.json
+*_2fa.txt
+
+# ── Generated at runtime ──
+Student_ID_Front.png
+daftar_sekolah.txt
+daftar_sekolah*.txt
+gh_edu.log
+settings.json
+
+# ── Debug artifacts ──
+_debug/
+security.html
+billing_page.html
+billing_error.html
+edu_form_page.html
+benefits_*.html
+
+# ── Build output ──
+build/
+dist/
+*.spec
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+
+# ── IDE / OS ──
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
