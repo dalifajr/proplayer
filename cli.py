@@ -679,6 +679,19 @@ def run_full_auto(session):
         _open_notepad(username, setup_key, recovery)
         status(t("tfa_notepad"), "ok")
 
+    def ask_confirm_submit(chosen, ai, slat, slon):
+        _clr()
+        print()
+        print(f"  {S.FAINT}{'─' * 44}{S.R}")
+        print(f"  {S.B}{S.WARN}⚠  READY TO SUBMIT{S.R}")
+        print(f"  {S.FAINT}{'─' * 44}{S.R}")
+        print(f"    {S.LABEL}School  {S.R} {chosen['name']}")
+        print(f"    {S.LABEL}City    {S.R} {ai.get('city', '')} ({ai.get('region', '')})")
+        print(f"    {S.LABEL}Coords  {S.R} {slat}, {slon}")
+        print(f"  {S.FAINT}{'─' * 44}{S.R}")
+        ans = input(f"  {S.ACC}>{S.R} Submit? [Y/n]: ").strip().lower()
+        return ans in ("", "y", "yes")
+
     try:
         pipe = core.AutoPipeline(
             session,
@@ -687,6 +700,7 @@ def run_full_auto(session):
             ask_use_existing=ask_existing,
             cam_filter=cam_filter,
             on_tfa_done=on_tfa_done,
+            ask_confirm_submit=ask_confirm_submit,
         )
         pipe.run()
         submit_ok = True

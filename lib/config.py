@@ -59,47 +59,144 @@ DEFAULT_DOCUMENT_LABEL = "Dated school ID"
 PHOTOS_DIR = os.path.join(BASE_DIR, "photos")
 
 # ── Defaults ──────────────────────────────────────────────────────────────
-DEFAULT_ADDRESS = {
-    "address": "Jl. Jenderal Ahmad Yani No.3, 9/10 Ulu, Kec. Seberang Ulu I",
-    "city": "Palembang", "region": "Sumatera Selatan",
-    "postal_code": "30111", "country_code": "ID",
-}
+# Large pool of real addresses in Palembang and surrounding areas
+_PALEMBANG_ADDRESS_POOL = [
+    # ── Palembang Kota ──────────────────────────────────────────────────
+    {"address": "Jl. Jenderal Ahmad Yani No.3, 9/10 Ulu, Kec. Seberang Ulu I",        "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30111"},
+    {"address": "Jl. Sudirman No.45, Sungai Pangeran, Kec. Ilir Timur I",              "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30127"},
+    {"address": "Jl. Kapten Abdul Halim No.10, Lorok Pakjo, Kec. Ilir Barat I",        "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30152"},
+    {"address": "Jl. Demang Lebar Daun No.89, Bukit Lama, Kec. Ilir Barat I",          "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30137"},
+    {"address": "Jl. Radial No.12, Suka Maju, Kec. Sako",                              "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30163"},
+    {"address": "Jl. Basuki Rahmat No.22, Talang Aman, Kec. Kemuning",                 "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30151"},
+    {"address": "Jl. Kolonel H. Barlian No.58, Srijaya, Kec. Alang-Alang Lebar",       "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30155"},
+    {"address": "Jl. Mayor Ruslan No.15, 20 Ilir D. III, Kec. Ilir Timur I",           "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30126"},
+    {"address": "Jl. R. Sukamto No.4, 8 Ilir, Kec. Ilir Timur II",                    "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30114"},
+    {"address": "Jl. Veteran No.37, 1 Ulu, Kec. Seberang Ulu I",                       "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30258"},
+    {"address": "Jl. Ki Gede Ing Suro No.8, 5 Ilir, Kec. Ilir Timur II",              "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30113"},
+    {"address": "Jl. Tasik No.6, Talang Betutu, Kec. Sukarami",                        "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30153"},
+    {"address": "Jl. Angkatan 45 No.22, Pahlawan, Kec. Kemuning",                      "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30128"},
+    {"address": "Jl. Inspektur Marzuki No.5, Ario Kemuning, Kec. Kemuning",            "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30151"},
+    {"address": "Jl. T. Nyak Arief No.65, Kec. Alang-Alang Lebar",                     "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30155"},
+    {"address": "Jl. Parameswara No.10, Talang Ratu, Kec. Alang-Alang Lebar",          "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30154"},
+    {"address": "Jl. POM IX No.18, Kemas Rindo, Kec. Kertapati",                       "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30259"},
+    {"address": "Jl. RE Martadinata No.3, Tanjung Batu, Kec. Plaju",                   "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30268"},
+    {"address": "Jl. Jenderal Sudirman No.2710, Kec. Ilir Barat II",                   "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30141"},
+    {"address": "Jl. Sei Selayur No.7, Kalidoni, Kec. Kalidoni",                       "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30119"},
+    {"address": "Jl. Abdul Rozak No.30, Sako, Kec. Sako",                              "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30163"},
+    {"address": "Jl. Perintis Kemerdekaan No.1, 7 Ulu, Kec. Seberang Ulu I",           "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30252"},
+    {"address": "Jl. Residen Abdul Rozak No.17, Bukit Besar, Kec. Ilir Barat I",       "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30139"},
+    {"address": "Jl. MP Mangkunegara No.9, Suka Bangun, Kec. Sukarami",                "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30153"},
+    {"address": "Jl. Letnan Murod No.6, Talang Semut, Kec. Bukit Kecil",               "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30113"},
+    {"address": "Jl. Gubernur H. Ahmad Bastari No.12, Jakabaring, Kec. Seberang Ulu II", "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30267"},
+    {"address": "Jl. Soekarno Hatta No.8, Lebong Gajah, Kec. Sematang Borang",         "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30164"},
+    {"address": "Jl. Pangeran Ratu No.14, 10 Ulu, Kec. Seberang Ulu I",                "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30254"},
+    {"address": "Jl. Merdeka No.28, Talang Aman, Kec. Kemuning",                       "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30151"},
+    {"address": "Jl. Rajawali No.11, Sungai Buah, Kec. Ilir Timur II",                 "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30115"},
+    {"address": "Jl. Ogan No.5, 14 Ulu, Kec. Seberang Ulu II",                         "city": "Palembang", "region": "Sumatera Selatan", "postal_code": "30262"},
+    # ── Prabumulih ──────────────────────────────────────────────────────
+    {"address": "Jl. Jenderal Sudirman No.17, Gunung Ibul, Kec. Prabumulih Timur",     "city": "Prabumulih",  "region": "Sumatera Selatan", "postal_code": "31111"},
+    {"address": "Jl. Lingkar No.9, Muara Dua, Kec. Prabumulih Selatan",                "city": "Prabumulih",  "region": "Sumatera Selatan", "postal_code": "31114"},
+    {"address": "Jl. Mayor Ruslan No.5, Sindur, Kec. Prabumulih Barat",               "city": "Prabumulih",  "region": "Sumatera Selatan", "postal_code": "31113"},
+    # ── Banyuasin / Palembang Sekitarnya ──────────────────────────────
+    {"address": "Jl. Raya Palembang-Betung KM 18, Sukajadi, Kec. Talang Kelapa",       "city": "Banyuasin",   "region": "Sumatera Selatan", "postal_code": "30761"},
+    {"address": "Jl. Merdeka No.3, Mariana, Kec. Banyuasin I",                          "city": "Banyuasin",   "region": "Sumatera Selatan", "postal_code": "30751"},
+    {"address": "Jl. Palembang-Betung No.35, Pangkalan Balai, Kec. Banyuasin III",     "city": "Banyuasin",   "region": "Sumatera Selatan", "postal_code": "30762"},
+    # ── Ogan Ilir ──────────────────────────────────────────────────────
+    {"address": "Jl. Lintas Timur Sumatera No.12, Indralaya, Kec. Indralaya",           "city": "Ogan Ilir",   "region": "Sumatera Selatan", "postal_code": "30662"},
+    {"address": "Jl. Palembang-Prabumulih KM 32, Tanjung Raja, Kec. Tanjung Raja",      "city": "Ogan Ilir",   "region": "Sumatera Selatan", "postal_code": "30651"},
+    # ── Muara Enim ─────────────────────────────────────────────────────
+    {"address": "Jl. Sudirman No.100, Muara Enim, Kec. Muara Enim",                     "city": "Muara Enim",  "region": "Sumatera Selatan", "postal_code": "31312"},
+    # ── Lahat ──────────────────────────────────────────────────────────
+    {"address": "Jl. Mayor Ruslan No.7, Lahat, Kec. Lahat",                             "city": "Lahat",       "region": "Sumatera Selatan", "postal_code": "31411"},
+]
+
+def get_random_default_address() -> dict:
+    """Return a random address from the Palembang area pool."""
+    entry = random.choice(_PALEMBANG_ADDRESS_POOL)
+    return {
+        "address": entry["address"],
+        "city": entry["city"],
+        "region": entry["region"],
+        "postal_code": entry["postal_code"],
+        "country_code": "ID",
+    }
+
+# Keep DEFAULT_ADDRESS pointing to first entry for backwards compat
+DEFAULT_ADDRESS = dict(_PALEMBANG_ADDRESS_POOL[0], country_code="ID")
 DEFAULT_COORDS = {"lat": "-2.999171", "lon": "104.771125"}
 
 # ── User-Agent Pool (dynamic generation) ──────────────────────────────────
 def _generate_ua_pool() -> list:
     """Generate a dynamic pool of realistic, up-to-date User-Agent strings.
-    Chrome/Edge versions are derived from the current date so they never go stale."""
+    Chrome/Edge/Firefox versions are derived from the current date so they never go stale."""
     now = datetime.now()
-    _anchor_ver = 131
-    _anchor_month = 12
-    _anchor_year = 2024
+    _anchor_ver   = 131;  _anchor_month = 12;  _anchor_year = 2024
     months_elapsed = (now.year - _anchor_year) * 12 + (now.month - _anchor_month)
     chrome_major = _anchor_ver + max(0, months_elapsed)
-    prev = chrome_major - 1
+    prev  = chrome_major - 1
     prev2 = chrome_major - 2
+    prev3 = chrome_major - 3
     _ff_anchor = 133
     ff_major = _ff_anchor + max(0, months_elapsed)
-    ff_prev = ff_major - 1
+    ff_prev  = ff_major - 1
+    ff_prev2 = ff_major - 2
     edge_major = chrome_major
-    edge_prev = prev
+    edge_prev  = prev
     safari_minor = 2 + max(0, (months_elapsed // 6))
-    safari_ver = f"18.{safari_minor}"
+    safari_ver   = f"18.{safari_minor}"
+    # Android Chrome build number roughly tracks chrome_major
+    android_build = f"{chrome_major}.0.6778.{135 + months_elapsed * 10}"
+    ios_safari_ver = f"18_{safari_minor}"
 
     pool = [
+        # ── Windows Chrome ────────────────────────────────────────────
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev3}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36 OPR/{chrome_major - 14}.0.0.0",
+        # ── macOS Chrome ──────────────────────────────────────────────
         f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
         f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
+        # ── Linux Chrome ──────────────────────────────────────────────
         f"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
+        # ── Windows Firefox ───────────────────────────────────────────
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_prev2}.0) Gecko/20100101 Firefox/{ff_prev2}.0",
+        f"Mozilla/5.0 (Windows NT 10.0; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
+        # ── macOS/Linux Firefox ───────────────────────────────────────
         f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14.0; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
         f"Mozilla/5.0 (X11; Linux x86_64; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
+        f"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
+        # ── Edge ──────────────────────────────────────────────────────
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{edge_major}.0.0.0 Safari/537.36 Edg/{edge_major}.0.0.0",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{edge_prev}.0.0.0 Safari/537.36 Edg/{edge_prev}.0.0.0",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{edge_major}.0.0.0 Safari/537.36 Edg/{edge_major}.0.0.0",
+        # ── Safari macOS ──────────────────────────────────────────────
         f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Safari/605.1.15",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Safari/605.1.15",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+        # ── Android Chrome ────────────────────────────────────────────
+        f"Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.6778.135 Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 13; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.6778.135 Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 13; Redmi Note 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.6778.135 Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 12; M2101K6G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.6778.135 Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; POCO F5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 13; CPH2387) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Mobile Safari/537.36",
+        # ── iOS Safari ────────────────────────────────────────────────
+        f"Mozilla/5.0 (iPhone; CPU iPhone OS {ios_safari_ver} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Mobile/15E148 Safari/604.1",
+        f"Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+        f"Mozilla/5.0 (iPad; CPU OS {ios_safari_ver} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Mobile/15E148 Safari/604.1",
+        # ── Android Firefox ───────────────────────────────────────────
+        f"Mozilla/5.0 (Android 14; Mobile; rv:{ff_major}.0) Gecko/{ff_major}.0 Firefox/{ff_major}.0",
+        f"Mozilla/5.0 (Android 13; Mobile; rv:{ff_prev}.0) Gecko/{ff_prev}.0 Firefox/{ff_prev}.0",
     ]
     return pool
 

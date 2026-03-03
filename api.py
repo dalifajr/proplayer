@@ -16,6 +16,7 @@ class Api:
         self._stop_flag = False
         self._window = None          # set by app.py after window creation
         self._2fa_resp = None        # stashed 2FA response for submit_2fa
+        self._confirm_result = None  # stashed answer for ask_confirm_submit
 
     # ── helpers ───────────────────────────────────────────────────────
     def _ok(self, data=None):
@@ -281,6 +282,24 @@ class Api:
         def on_tfa_done(result, clip_text):
             self._js(f"onAutoTfaDone({json.dumps(result)},{json.dumps(clip_text)})")
 
+        def ask_confirm_submit(chosen, ai, slat, slon):
+            info = {
+                "school": chosen["name"],
+                "city":   ai.get("city", ""),
+                "region": ai.get("region", ""),
+                "lat":    slat,
+                "lon":    slon,
+            }
+            self._confirm_result = None
+            self._js(f"onAutoConfirmSubmit({json.dumps(info)})")
+            for _ in range(1200):  # max 60 s
+                if self._confirm_result is not None:
+                    return self._confirm_result
+                if self._stop_flag:
+                    return False
+                time.sleep(0.05)
+            return False  # timeout → cancel
+
         try:
             # ── Pipeline (all 10 steps handled inside) ───────────────
             pipe = core.AutoPipeline(
@@ -294,6 +313,7 @@ class Api:
                 ask_use_existing=ask_use_existing,
                 cam_filter=cam_filter,
                 on_tfa_done=on_tfa_done,
+                ask_confirm_submit=ask_confirm_submit,
             )
             pipe.run()
             self._js("onAutoDone()")
@@ -314,6 +334,11 @@ class Api:
     def answer_existing(self, use_existing):
         """Called from JS to answer the ask_use_existing dialog."""
         self._ask_result = bool(use_existing)
+        return self._ok()
+
+    def answer_confirm_submit(self, confirmed):
+        """Called from JS to answer the confirm-before-submit dialog."""
+        self._confirm_result = bool(confirmed)
         return self._ok()
 
     # ── 2FA ───────────────────────────────────────────────────────────

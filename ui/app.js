@@ -600,6 +600,12 @@ window.onAutoAskExisting = async (count) => {
   const ok = await modal('School List', `Found ${count} qualifying schools in file.\n\nUse existing list?`, { okText: 'Yes', cancelText: 'No' });
   callApi('answer_existing', !!ok);
 };
+
+window.onAutoConfirmSubmit = async (info) => {
+  const msg = `School : ${info.school}\nCity   : ${info.city}, ${info.region}\nCoords : ${info.lat}, ${info.lon}\n\nProceed with submission?`;
+  const ok = await modal('Ready to Submit', msg, { okText: 'Submit', cancelText: 'Cancel' });
+  callApi('answer_confirm_submit', !!ok);
+};
 // ── Status Monitor ───────────────────────────────────────────────────
 let _monitorInterval = null;
 let _monitorCount    = 0;
