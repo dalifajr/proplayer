@@ -633,8 +633,9 @@ function runAuto() {
   const lon = $('auto-lon').value.trim();
   const school = $('auto-school').value || null;
   const camFilter = $('auto-cam-filter').value || null;
+  const proofType = $('auto-proof-type').value || 'id_card';
   // Full auto: profile check → 2FA check/setup → pipeline (mirrors CLI flow)
-  callApi('run_full_auto', lat, lon, school, camFilter);
+  callApi('run_full_auto', lat, lon, school, camFilter, proofType);
 }
 
 window.onAutoStep = (n, t) => {

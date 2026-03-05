@@ -27,7 +27,7 @@ from lib.config import (
     TFA_RECOVERY_URL,
     SESSION_FILE, SETTINGS_FILE, HISTORY_FILE,
     SCHOOL_LIST_FILE, KEYWORDS_FILE,
-    DEFAULT_DOCUMENT_LABEL, PHOTOS_DIR,
+    DEFAULT_DOCUMENT_LABEL, TRANSCRIPT_DOCUMENT_LABEL, PHOTOS_DIR,
     DEFAULT_ADDRESS, DEFAULT_COORDS,
     INDO_CITIES, INDO_FIRST, INDO_LAST,
     _CAMERA_DEVICES, _CAMERA_FILENAMES,
@@ -76,6 +76,12 @@ from lib.idcard import (
     _load_random_photo_png, _embed_photo_on_card,
     _ID_TEMPLATES, generate_student_id,
 )
+
+# Transcript
+from lib.transcript import generate_transcript
+
+# Logo
+from lib.logo import fetch_logo, fetch_logos_bulk, get_logo_path
 
 # GitHub actions
 from lib.github import (

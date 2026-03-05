@@ -242,7 +242,7 @@ class Api:
             self._js(f"onSearchError({json.dumps(str(e))})")
 
     # ── Auto Pipeline ────────────────────────────────────────────────
-    def run_full_auto(self, lat=None, lon=None, school_json=None, cam_filter=None):
+    def run_full_auto(self, lat=None, lon=None, school_json=None, cam_filter=None, proof_type=None):
         """Full pipeline: 2FA check/setup → AutoPipeline (mirrors cli.py flow)."""
         if not self.session: return self._err("Not logged in.")
         self._stop_flag = False
@@ -254,11 +254,12 @@ class Api:
             cf = False
         else:
             cf = None
+        pt = proof_type if proof_type in ("id_card", "transcript") else "id_card"
         threading.Thread(target=self._full_auto_worker,
-                         args=(lat, lon, manual, cf), daemon=True).start()
+                         args=(lat, lon, manual, cf, pt), daemon=True).start()
         return self._ok("started")
 
-    def _full_auto_worker(self, lat, lon, manual, cam_filter=None):
+    def _full_auto_worker(self, lat, lon, manual, cam_filter=None, proof_type="id_card"):
         def on_step(n, title):
             self._js(f"onAutoStep({n},{json.dumps(title)})")
 
@@ -312,6 +313,7 @@ class Api:
                 stop=lambda: self._stop_flag,
                 ask_use_existing=ask_use_existing,
                 cam_filter=cam_filter,
+                proof_type=proof_type,
                 on_tfa_done=on_tfa_done,
                 ask_confirm_submit=ask_confirm_submit,
             )

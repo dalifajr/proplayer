@@ -616,6 +616,20 @@ def _ask_cam_filter():
     return None
 
 
+def _ask_proof_type():
+    """Prompt user to choose proof document type."""
+    print()
+    print(f"  {S.ACC}📄  Proof Document Type{S.R}")
+    print(f"  {S.FAINT}{'─' * 40}{S.R}")
+    print(f"    {S.VAL}1{S.R}  {S.FG}Student ID Card (Kartu Mahasiswa){S.R}")
+    print(f"    {S.VAL}2{S.R}  {S.OK}Academic Transcript (Transkrip Nilai){S.R}")
+    print(f"  {S.FAINT}{'─' * 40}{S.R}")
+    choice = input(f"  {S.ACC}>{S.R} Choose [1/2] (default=1): ").strip()
+    if choice == "2":
+        return "transcript"
+    return "id_card"
+
+
 def run_full_auto(session):
     _t_start = time.time()
     _steps   = [0]          # tracks last completed step number
@@ -624,6 +638,7 @@ def run_full_auto(session):
     print()
 
     cam_filter = _ask_cam_filter()
+    proof_type = _ask_proof_type()
     print()
 
     submit_ok = False
@@ -731,6 +746,7 @@ def run_full_auto(session):
             on_sub=on_sub, stop=lambda: False,
             ask_use_existing=ask_existing,
             cam_filter=cam_filter,
+            proof_type=proof_type,
             on_tfa_done=on_tfa_done,
             ask_confirm_submit=ask_confirm_submit,
         )

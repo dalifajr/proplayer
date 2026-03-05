@@ -194,6 +194,7 @@ def _embed_photo_on_card(px, card_w, card_h, photo_path, x1, y1, x2, y2):
 # ── ID Card Templates ────────────────────────────────────────────────────
 _ID_TEMPLATES = [
     {
+        "name": "formal_blue",
         "bg": (255, 255, 255), "header_bg": (25, 60, 140),
         "header_text": (255, 255, 255), "accent": (200, 220, 255),
         "footer_bg": (25, 60, 140), "footer_text": (255, 255, 255),
@@ -201,6 +202,7 @@ _ID_TEMPLATES = [
         "value_color": (0, 0, 0), "status_color": (0, 120, 0),
     },
     {
+        "name": "campus_teal",
         "bg": (245, 250, 250), "header_bg": (0, 128, 128),
         "header_text": (255, 255, 255), "accent": (180, 230, 230),
         "footer_bg": (0, 100, 100), "footer_text": (220, 255, 255),
@@ -208,6 +210,7 @@ _ID_TEMPLATES = [
         "value_color": (20, 20, 20), "status_color": (0, 140, 80),
     },
     {
+        "name": "elegant_maroon",
         "bg": (255, 252, 248), "header_bg": (128, 0, 32),
         "header_text": (255, 220, 200), "accent": (220, 180, 180),
         "footer_bg": (100, 0, 25), "footer_text": (255, 230, 210),
@@ -215,6 +218,7 @@ _ID_TEMPLATES = [
         "value_color": (40, 0, 0), "status_color": (0, 100, 50),
     },
     {
+        "name": "campus_green",
         "bg": (248, 255, 248), "header_bg": (34, 100, 34),
         "header_text": (230, 255, 230), "accent": (180, 220, 180),
         "footer_bg": (20, 80, 20), "footer_text": (200, 255, 200),
@@ -222,6 +226,7 @@ _ID_TEMPLATES = [
         "value_color": (10, 30, 10), "status_color": (0, 120, 0),
     },
     {
+        "name": "academic_navy",
         "bg": (252, 248, 255), "header_bg": (72, 30, 120),
         "header_text": (230, 210, 255), "accent": (200, 180, 230),
         "footer_bg": (55, 20, 100), "footer_text": (220, 200, 255),
@@ -231,41 +236,114 @@ _ID_TEMPLATES = [
 ]
 
 
-def generate_student_id(name, school_name, student_id=None):
-    """Generate an ID card using a random template and optional photo."""
+def generate_student_id(name, school_name, student_id=None, logo_path=None, template_name=None):
+    """Generate an ID card using a random template and optional photo + logo."""
     if not student_id:
         student_id = "STU" + "".join(random.choices(string.digits, k=8))
 
-    tmpl = random.choice(_ID_TEMPLATES)
-    W, H = 600, 380
+    tmpl = None
+    if template_name:
+        for candidate in _ID_TEMPLATES:
+            if candidate.get("name") == template_name:
+                tmpl = candidate
+                break
+    if tmpl is None:
+        tmpl = random.choice(_ID_TEMPLATES)
+    W, H = 420, 640
     px = bytearray(W * H * 4)
 
-    _rect(px, W, H, 0, 0, W, H, *tmpl["bg"])
-    _rect(px, W, H, 0, 0, W, 80, *tmpl["header_bg"])
-    _bmp_text(px, W, H, 20, 10, school_name[:40], *tmpl["header_text"], sc=3)
-    _bmp_text(px, W, H, 20, 45, tmpl["title"], *tmpl["accent"], sc=2)
+    # Base layers: outer border, inner canvas, and structured header zones.
+    _rect(px, W, H, 0, 0, W, H, 20, 24, 32)
+    _rect(px, W, H, 6, 6, W - 6, H - 6, *tmpl["bg"])
+    _rect(px, W, H, 6, 6, W - 6, 132, *tmpl["header_bg"])
+    _rect(px, W, H, 6, 132, W - 6, 148, *tmpl["accent"])
+
+    # Logo container in header.
+    _rect(px, W, H, 18, 18, 108, 108, 245, 247, 252)
+    _rect(px, W, H, 22, 22, 104, 104, 255, 255, 255)
+
+    # ── Logo in header (left side for portrait layout) ───────────────
+    logo_w = 0
+    if logo_path and os.path.isfile(logo_path):
+        try:
+            from PIL import Image
+            with Image.open(logo_path) as logo:
+                logo = logo.convert("RGBA")
+                lh = 70
+                lw = int(logo.width * lh / logo.height)
+                lw = min(lw, 78)
+                logo = logo.resize((lw, lh), Image.LANCZOS)
+                logo_x = 24 + (78 - lw) // 2
+                logo_y = 28
+                logo_pixels = logo.tobytes()
+                for py_off in range(lh):
+                    for px_off in range(lw):
+                        src_idx = (py_off * lw + px_off) * 4
+                        dst_x = logo_x + px_off
+                        dst_y = logo_y + py_off
+                        if 0 <= dst_x < W and 0 <= dst_y < H:
+                            dst_idx = (dst_y * W + dst_x) * 4
+                            alpha = logo_pixels[src_idx + 3]
+                            if alpha > 128:
+                                px[dst_idx] = logo_pixels[src_idx]
+                                px[dst_idx + 1] = logo_pixels[src_idx + 1]
+                                px[dst_idx + 2] = logo_pixels[src_idx + 2]
+                                px[dst_idx + 3] = 255
+                logo_w = 104
+                logger.info("Logo embedded on ID card: %s (%dx%d)", logo_path, lw, lh)
+        except Exception as e:
+            logger.warning("Logo embed failed on ID card: %s", e)
+
+    text_x = 24 + logo_w
+    _bmp_text(px, W, H, text_x, 24, "OFFICIAL STUDENT CARD", *tmpl["accent"], sc=2)
+    _bmp_text(px, W, H, text_x, 54, school_name[:26], *tmpl["header_text"], sc=2)
+    _bmp_text(px, W, H, text_x, 84, "ACADEMIC YEAR 2025/2026", *tmpl["accent"], sc=1)
+
+    # Photo panel with double frame.
+    _rect(px, W, H, 92, 164, 328, 408, 220, 225, 235)
+    _rect(px, W, H, 98, 170, 322, 402, 255, 255, 255)
 
     photo_info = _load_random_photo_png()
     _embed_photo_on_card(px, W, H,
                          photo_info[0] if photo_info else "",
-                         20, 100, 170, 290)
+                         110, 182, 310, 390)
 
-    _bmp_text(px, W, H, 190, 110, "NAME:", *tmpl["label_color"], sc=2)
-    _bmp_text(px, W, H, 190, 135, name[:30], *tmpl["value_color"], sc=2)
-    _bmp_text(px, W, H, 190, 170, "STUDENT ID:", *tmpl["label_color"], sc=2)
-    _bmp_text(px, W, H, 190, 195, student_id, *tmpl["value_color"], sc=2)
-    _bmp_text(px, W, H, 190, 230, "STATUS: ACTIVE", *tmpl["status_color"], sc=2)
+    # Info panel background.
+    _rect(px, W, H, 24, 420, W - 24, 590, 248, 250, 255)
+    _rect(px, W, H, 24, 452, W - 24, 454, 225, 230, 240)
+    _rect(px, W, H, 24, 484, W - 24, 486, 225, 230, 240)
+    _rect(px, W, H, 24, 516, W - 24, 518, 225, 230, 240)
+
+    _bmp_text(px, W, H, 36, 430, "NAME", *tmpl["label_color"], sc=1)
+    _bmp_text(px, W, H, 36, 460, "STUDENT ID", *tmpl["label_color"], sc=1)
+    _bmp_text(px, W, H, 36, 492, "PROGRAM", *tmpl["label_color"], sc=1)
+    _bmp_text(px, W, H, 36, 524, "STATUS", *tmpl["label_color"], sc=1)
+
+    _bmp_text(px, W, H, 138, 428, name[:26], *tmpl["value_color"], sc=2)
+    _bmp_text(px, W, H, 138, 460, student_id[:20], *tmpl["value_color"], sc=2)
+    _bmp_text(px, W, H, 138, 492, "INFORMATION SYSTEM", *tmpl["value_color"], sc=1)
+    _bmp_text(px, W, H, 138, 524, "ACTIVE", *tmpl["status_color"], sc=2)
 
     issued = datetime.now().strftime("%Y/%m/%d")
     _validity = int(load_settings().get("id_validity_days", 730))
     valid = (datetime.now() + timedelta(days=_validity)).strftime("%Y/%m/%d")
-    _bmp_text(px, W, H, 190, 265, f"ISSUED: {issued}", 80, 80, 80, sc=2)
-    _bmp_text(px, W, H, 190, 290, f"VALID: {valid}", 80, 80, 80, sc=2)
+    _bmp_text(px, W, H, 36, 556, f"ISSUED {issued}", 80, 80, 80, sc=1)
+    _bmp_text(px, W, H, 196, 556, f"VALID {valid}", 80, 80, 80, sc=1)
 
-    _rect(px, W, H, 0, 340, W, 380, *tmpl["footer_bg"])
-    _bmp_text(px, W, H, 20, 352, school_name[:50], *tmpl["footer_text"], sc=2)
+    # Security pattern block to emulate barcode/serial strip.
+    sec_x = 296
+    for i in range(16):
+        bar_h = 10 + (i % 3) * 3
+        color = 55 if i % 2 == 0 else 130
+        _rect(px, W, H, sec_x + i * 5, 548, sec_x + i * 5 + 2, 548 + bar_h, color, color, color)
 
-    out = os.path.join(BASE_DIR, "Student_ID_Front.png")
+    _rect(px, W, H, 6, 598, W - 6, 634, *tmpl["footer_bg"])
+    _bmp_text(px, W, H, 18, 610, school_name[:24], *tmpl["footer_text"], sc=1)
+    _bmp_text(px, W, H, 250, 610, f"CARD NO {student_id[-8:]}", *tmpl["footer_text"], sc=1)
+
+    out_dir = os.path.join(BASE_DIR, "outputs", "id_cards")
+    os.makedirs(out_dir, exist_ok=True)
+    out = os.path.join(out_dir, "Student_ID_Front.png")
     with open(out, "wb") as f:
         f.write(_make_png(W, H, bytes(px)))
     return out

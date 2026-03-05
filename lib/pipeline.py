@@ -5,7 +5,7 @@ import time
 from typing import Callable, Dict, List, Optional
 
 from .config import (
-    BASE_DIR, DEFAULT_COORDS, DEFAULT_DOCUMENT_LABEL,
+    BASE_DIR, DEFAULT_COORDS, DEFAULT_DOCUMENT_LABEL, TRANSCRIPT_DOCUMENT_LABEL,
     SCHOOL_SEARCH_URL, load_settings, generate_indo_name, logger,
     generate_student_bio, generate_repo_name, generate_repo_description,
     INDO_CITIES, add_history_entry, get_random_default_address,
@@ -23,6 +23,8 @@ from .github import (
     get_benefits, create_repository,
 )
 from .idcard import generate_student_id
+from .transcript import generate_transcript
+from .logo import fetch_logo, fetch_logos_bulk, get_logo_path
 
 
 class SubmitCancelledError(Exception):
@@ -62,7 +64,8 @@ class AutoPipeline:
     def __init__(self, session, *, spoof_lat=None, spoof_lon=None,
                  manual_school=None, on_step=None, on_log=None,
                  on_sub=None, stop=None, ask_use_existing=None,
-                 cam_filter=None, on_tfa_done=None, ask_confirm_submit=None):
+                 cam_filter=None, on_tfa_done=None, ask_confirm_submit=None,
+                 proof_type="id_card"):
         self.s = session
         self.lat = spoof_lat or DEFAULT_COORDS["lat"]
         self.lon = spoof_lon or DEFAULT_COORDS["lon"]
@@ -78,6 +81,8 @@ class AutoPipeline:
         self._on_tfa_done = on_tfa_done  # callable(result_dict, clip_text_str)
         # callable() -> bool: called before submit. None=auto-proceed
         self._ask_confirm_submit = ask_confirm_submit
+        # proof_type: "id_card" or "transcript"
+        self.proof_type = proof_type
 
     def _stopped(self):
         return self._stop()
@@ -114,7 +119,7 @@ class AutoPipeline:
         chosen = self._s8_select(qualified)
 
         # 9 — Generate Student ID
-        id_path = self._s9_id(full_name, chosen["name"])
+        id_path = self._s9_id(full_name, chosen)
 
         # 10 — Submit application (includes address geocoding)
         addr, slat, slon = self._s10_submit(chosen, id_path)
@@ -329,6 +334,17 @@ class AutoPipeline:
             self._log(
                 f"\u2714 Found {len(af)} total, {len(q)} qualified (cam-only: {cam_true})",
                 "ok")
+            # Fetch logos for qualifying schools
+            if q and not self._stopped():
+                self._log("\U0001F3A8 Fetching school logos...", "info")
+                n_logos = fetch_logos_bulk(
+                    q,
+                    on_log=self._log,
+                    on_sub=self._sub,
+                    allow_placeholder=False,
+                    force_refresh=True,
+                )
+                self._log(f"\u2714 Logos cached: {n_logos}/{len(q)}", "ok")
         if not q:
             self._log("\u2718 No qualifying schools!", "err")
             return []
@@ -363,20 +379,38 @@ class AutoPipeline:
             c = self.manual_school
             cam = "cam" if c.get('camera_required') != 'false' else "upload"
             self._log(f"\u2714 Picked: {c['name']} (ID: {c.get('id', '')}, {cam})", "ok")
-            return c
-        top_n = min(5, len(qualified))
-        c = random.choice(qualified[:top_n])
-        cam = "cam" if c.get('camera_required') != 'false' else "upload"
-        self._log(f"\u2714 Auto-pick: {c['name']} (ID: {c.get('id', '')}, {cam})", "ok")
+        else:
+            top_n = min(5, len(qualified))
+            c = random.choice(qualified[:top_n])
+            cam = "cam" if c.get('camera_required') != 'false' else "upload"
+            self._log(f"\u2714 Auto-pick: {c['name']} (ID: {c.get('id', '')}, {cam})", "ok")
+        # Ensure logo is fetched for the chosen school
+        logo = get_logo_path(c, real_only=True)
+        if not logo:
+            self._sub(f"Fetching logo: {c['name'][:40]}")
+            logo = fetch_logo(c, on_log=self._log, allow_placeholder=False, force_refresh=True)
+        if logo:
+            self._log(f"\u2714 Logo: {os.path.basename(logo)}", "ok")
+        else:
+            self._log("\u26A0 Logo asli tidak ditemukan; lanjut tanpa logo.", "warn")
         return c
 
-    # ── Step 9 — Generate Student ID ──────────────────────────────────────
-    def _s9_id(self, full_name, school_name):
-        self._step(9, "Generating Student ID")
-        if self._stopped():
-            return ""
-        p = generate_student_id(full_name, school_name)
-        self._log(f"\u2714 ID Card: {os.path.basename(p)}", "ok")
+    # ── Step 9 — Generate Student ID / Transcript ─────────────────────────
+    def _s9_id(self, full_name, chosen):
+        school_name = chosen["name"]
+        logo = get_logo_path(chosen, real_only=True)
+        if self.proof_type == "transcript":
+            self._step(9, "Generating Transcript")
+            if self._stopped():
+                return ""
+            p = generate_transcript(full_name, school_name, logo_path=logo)
+            self._log(f"\u2714 Transcript: {os.path.basename(p)}", "ok")
+        else:
+            self._step(9, "Generating Student ID")
+            if self._stopped():
+                return ""
+            p = generate_student_id(full_name, school_name, logo_path=logo)
+            self._log(f"\u2714 ID Card: {os.path.basename(p)}", "ok")
         return p
 
     # ── Step 10 — Submit application ──────────────────────────────────────
@@ -414,8 +448,11 @@ class AutoPipeline:
         camera = chosen.get("camera_required", "false") != "false"
         if camera:
             self._log("\U0001F4F7 Camera school detected \u2192 simulating webcam capture", "info")
+        doc_label = (TRANSCRIPT_DOCUMENT_LABEL
+                     if self.proof_type == "transcript"
+                     else DEFAULT_DOCUMENT_LABEL)
         submit_edu_app(self.s, chosen["name"], id_path,
-                       DEFAULT_DOCUMENT_LABEL,
+                       doc_label,
                        lat=slat, lon=slon,
                        school_id=chosen.get("id", ""),
                        camera_mode=camera)

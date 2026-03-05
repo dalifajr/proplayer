@@ -56,6 +56,7 @@ SCHOOL_LIST_FILE = os.path.join(BASE_DIR, "daftar_sekolah.txt")
 KEYWORDS_FILE = os.path.join(BASE_DIR, "keywords.txt")
 _BUNDLED_KEYWORDS = os.path.join(_BUNDLE_DIR, "keywords.txt")
 DEFAULT_DOCUMENT_LABEL = "Dated school ID"
+TRANSCRIPT_DOCUMENT_LABEL = "Dated official/unofficial transcript"
 PHOTOS_DIR = os.path.join(BASE_DIR, "photos")
 
 # ── Defaults ──────────────────────────────────────────────────────────────
@@ -130,73 +131,87 @@ def _generate_ua_pool() -> list:
     """Generate a dynamic pool of realistic, up-to-date User-Agent strings.
     Chrome/Edge/Firefox versions are derived from the current date so they never go stale."""
     now = datetime.now()
-    _anchor_ver   = 131;  _anchor_month = 12;  _anchor_year = 2024
-    months_elapsed = (now.year - _anchor_year) * 12 + (now.month - _anchor_month)
-    chrome_major = _anchor_ver + max(0, months_elapsed)
-    prev  = chrome_major - 1
-    prev2 = chrome_major - 2
-    prev3 = chrome_major - 3
-    _ff_anchor = 133
-    ff_major = _ff_anchor + max(0, months_elapsed)
-    ff_prev  = ff_major - 1
-    ff_prev2 = ff_major - 2
+    _anchor_ver = 132
+    _anchor_month = 1
+    _anchor_year = 2025
+    months_elapsed = max(0, (now.year - _anchor_year) * 12 + (now.month - _anchor_month))
+
+    chrome_major = _anchor_ver + months_elapsed
+    prev = max(120, chrome_major - 1)
+    prev2 = max(119, chrome_major - 2)
+    prev3 = max(118, chrome_major - 3)
+
+    ff_anchor = 134
+    ff_major = ff_anchor + months_elapsed
+    ff_prev = max(120, ff_major - 1)
+    ff_prev2 = max(119, ff_major - 2)
+
     edge_major = chrome_major
-    edge_prev  = prev
-    safari_minor = 2 + max(0, (months_elapsed // 6))
-    safari_ver   = f"18.{safari_minor}"
-    # Android Chrome build number roughly tracks chrome_major
-    android_build = f"{chrome_major}.0.6778.{135 + months_elapsed * 10}"
+    edge_prev = prev
+
+    safari_minor = 1 + (months_elapsed // 6)
+    safari_ver = f"18.{safari_minor}"
     ios_safari_ver = f"18_{safari_minor}"
 
+    android_build_now = f"{chrome_major}.0.0.0"
+    android_build_prev = f"{prev}.0.0.0"
+    android_build_prev2 = f"{prev2}.0.0.0"
+
     pool = [
-        # ── Windows Chrome ────────────────────────────────────────────
+        # ── Desktop: Windows Chrome/Edge/Firefox ─────────────────────
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36 Edg/{edge_major}.0.0.0",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36 Edg/{edge_prev}.0.0.0",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.0.0 Safari/537.36",
         f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev3}.0.0.0 Safari/537.36",
-        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36 OPR/{chrome_major - 14}.0.0.0",
-        # ── macOS Chrome ──────────────────────────────────────────────
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36 OPR/{max(95, chrome_major - 14)}.0.0.0",
+        # ── Desktop: macOS (Intel + Apple Silicon) ───────────────────
         f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Safari/605.1.15",
+        f"Mozilla/5.0 (Macintosh; ARM Mac OS X 14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Macintosh; ARM Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Safari/605.1.15",
+        f"Mozilla/5.0 (Macintosh; ARM Mac OS X 14_5; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
         f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
-        # ── Linux Chrome ──────────────────────────────────────────────
+        # ── Desktop: Linux ────────────────────────────────────────────
         f"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
         f"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Safari/537.36",
-        f"Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36",
-        # ── Windows Firefox ───────────────────────────────────────────
-        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
-        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
-        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_prev2}.0) Gecko/20100101 Firefox/{ff_prev2}.0",
-        f"Mozilla/5.0 (Windows NT 10.0; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
-        # ── macOS/Linux Firefox ───────────────────────────────────────
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14.0; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
-        f"Mozilla/5.0 (X11; Linux x86_64; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
+        f"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:{ff_major}.0) Gecko/20100101 Firefox/{ff_major}.0",
         f"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:{ff_prev}.0) Gecko/20100101 Firefox/{ff_prev}.0",
-        # ── Edge ──────────────────────────────────────────────────────
-        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{edge_major}.0.0.0 Safari/537.36 Edg/{edge_major}.0.0.0",
-        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{edge_prev}.0.0.0 Safari/537.36 Edg/{edge_prev}.0.0.0",
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{edge_major}.0.0.0 Safari/537.36 Edg/{edge_major}.0.0.0",
-        # ── Safari macOS ──────────────────────────────────────────────
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Safari/605.1.15",
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Safari/605.1.15",
-        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
-        # ── Android Chrome ────────────────────────────────────────────
-        f"Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build} Mobile Safari/537.36",
-        f"Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.6778.135 Mobile Safari/537.36",
-        f"Mozilla/5.0 (Linux; Android 13; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.6778.135 Mobile Safari/537.36",
-        f"Mozilla/5.0 (Linux; Android 13; Redmi Note 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.6778.135 Mobile Safari/537.36",
-        f"Mozilla/5.0 (Linux; Android 12; M2101K6G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.6778.135 Mobile Safari/537.36",
-        f"Mozilla/5.0 (Linux; Android 14; POCO F5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Mobile Safari/537.36",
-        f"Mozilla/5.0 (Linux; Android 13; CPH2387) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev}.0.0.0 Mobile Safari/537.36",
-        # ── iOS Safari ────────────────────────────────────────────────
+        # ── Smartphone: Android Chrome/Firefox/Edge ──────────────────
+        f"Mozilla/5.0 (Linux; Android 15; Pixel 9 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_now} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 15; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_now} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; SM-A556E) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev2} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; CPH2609) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; V2332) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev2} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; 23113RKC6G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; CPH2527) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev2} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; Infinix X6851) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; TECNO KL7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev2} Mobile Safari/537.36",
+        f"Mozilla/5.0 (Android 15; Mobile; rv:{ff_major}.0) Gecko/{ff_major}.0 Firefox/{ff_major}.0",
+        f"Mozilla/5.0 (Android 14; Mobile; rv:{ff_prev}.0) Gecko/{ff_prev}.0 Firefox/{ff_prev}.0",
+        f"Mozilla/5.0 (Linux; Android 15; Pixel 9 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_now} Mobile Safari/537.36 EdgA/{edge_major}.0.0.0",
+        # ── Smartphone: iPhone/iPad Safari/Chrome/Edge ───────────────
         f"Mozilla/5.0 (iPhone; CPU iPhone OS {ios_safari_ver} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Mobile/15E148 Safari/604.1",
-        f"Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+        f"Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/{chrome_major}.0.0.0 Mobile/15E148 Safari/604.1",
+        f"Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) EdgiOS/{edge_major}.0.0 Mobile/15E148 Safari/604.1",
+        f"Mozilla/5.0 (iPhone; CPU iPhone OS 17_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.7 Mobile/15E148 Safari/604.1",
         f"Mozilla/5.0 (iPad; CPU OS {ios_safari_ver} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_ver} Mobile/15E148 Safari/604.1",
-        # ── Android Firefox ───────────────────────────────────────────
-        f"Mozilla/5.0 (Android 14; Mobile; rv:{ff_major}.0) Gecko/{ff_major}.0 Firefox/{ff_major}.0",
-        f"Mozilla/5.0 (Android 13; Mobile; rv:{ff_prev}.0) Gecko/{ff_prev}.0 Firefox/{ff_prev}.0",
+        f"Mozilla/5.0 (iPad; CPU OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/{prev}.0.0.0 Mobile/15E148 Safari/604.1",
+        # ── Tablet Android ────────────────────────────────────────────
+        f"Mozilla/5.0 (Linux; Android 14; SM-X210) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; Lenovo TB370FU) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev2} Safari/537.36",
+        f"Mozilla/5.0 (Linux; Android 14; Redmi Pad Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{android_build_prev} Safari/537.36",
+        # ── Legacy entries for compatibility spread ───────────────────
+        f"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{prev2}.0.0.0 Safari/537.36",
+        f"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ff_prev2}.0) Gecko/20100101 Firefox/{ff_prev2}.0",
+        f"Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15",
     ]
     return pool
 
@@ -384,6 +399,64 @@ def clear_log_file():
 
 # ── Camera Device Labels ─────────────────────────────────────────────────
 _CAMERA_DEVICES = [
+    "camera2 1, facing front (Google Pixel 9 Pro)",
+    "camera2 0, facing back (Google Pixel 9 Pro)",
+    "camera2 1, facing front (Google Pixel 8a)",
+    "camera2 0, facing back (Google Pixel 8a)",
+    "camera2 1, facing front (samsung SM-S928B Galaxy S24 Ultra)",
+    "camera2 0, facing back (samsung SM-S928B Galaxy S24 Ultra)",
+    "camera2 1, facing front (samsung SM-S921B Galaxy S24)",
+    "camera2 0, facing back (samsung SM-S921B Galaxy S24)",
+    "camera2 1, facing front (samsung SM-A556E Galaxy A55 5G)",
+    "camera2 0, facing back (samsung SM-A556E Galaxy A55 5G)",
+    "camera2 1, facing front (Xiaomi 14T Pro)",
+    "camera2 0, facing back (Xiaomi 14T Pro)",
+    "camera2 1, facing front (Redmi Note 13 Pro 5G)",
+    "camera2 0, facing back (Redmi Note 13 Pro 5G)",
+    "camera2 1, facing front (POCO X6 Pro)",
+    "camera2 0, facing back (POCO X6 Pro)",
+    "camera2 1, facing front (vivo V2332 V30)",
+    "camera2 0, facing back (vivo V2332 V30)",
+    "camera2 1, facing front (OPPO CPH2609 Reno11 F 5G)",
+    "camera2 0, facing back (OPPO CPH2609 Reno11 F 5G)",
+    "camera2 1, facing front (Realme RMX3996 12+ 5G)",
+    "camera2 0, facing back (Realme RMX3996 12+ 5G)",
+    "camera2 1, facing front (Infinix X6851 NOTE 40)",
+    "camera2 0, facing back (Infinix X6851 NOTE 40)",
+    "camera2 1, facing front (TECNO KL7 CAMON 30 5G)",
+    "camera2 0, facing back (TECNO KL7 CAMON 30 5G)",
+    "camera2 1, facing front (iPhone 15 Pro)",
+    "camera2 0, facing back (iPhone 15 Pro)",
+    "camera2 1, facing front (iPhone 14)",
+    "camera2 0, facing back (iPhone 14)",
+    "camera2 1, facing front (OnePlus 12R)",
+    "camera2 0, facing back (OnePlus 12R)",
+    "camera2 1, facing front (Nothing Phone (2a))",
+    "camera2 0, facing back (Nothing Phone (2a))",
+    "camera2 1, facing front (Honor 200)",
+    "camera2 0, facing back (Honor 200)",
+    "camera2 1, facing front (ASUS Zenfone 11 Ultra)",
+    "camera2 0, facing back (ASUS Zenfone 11 Ultra)",
+    "camera2 1, facing front (Lenovo TB370FU Tab P12)",
+    "camera2 0, facing back (Lenovo TB370FU Tab P12)",
+    "camera2 1, facing front (samsung SM-X210 Galaxy Tab A9+)",
+    "camera2 0, facing back (samsung SM-X210 Galaxy Tab A9+)",
+    "camera2 1, facing front (Xiaomi Redmi Pad Pro)",
+    "camera2 0, facing back (Xiaomi Redmi Pad Pro)",
+    "Logitech BRIO 500 (046d:0943)",
+    "Logitech MX Brio 4K (046d:094c)",
+    "Logitech C920 HD Pro Webcam (046d:082d)",
+    "Razer Kiyo Pro (1532:0e03)",
+    "Insta360 Link 4K (2e1a:4c01)",
+    "Elgato Facecam Pro (0fd9:008e)",
+    "OBSBOT Tiny 2 (345f:50a2)",
+    "AVerMedia PW513 4K (07ca:0588)",
+    "Dell UltraSharp Webcam WB7022 (413c:c015)",
+    "HP 965 4K Streaming Webcam (03f0:1061)",
+    "Lenovo Performance FHD Webcam (17ef:483a)",
+    "Integrated Camera (SunplusIT)",
+    "Integrated Camera (Chicony)",
+    "Integrated IR Camera (Windows Hello)",
     "camera2 1, facing front (Infinix X6831 HOT 30i)",
     "camera2 1, facing front (Infinix X6711 NOTE 30 VIP)",
     "camera2 0, facing back (Infinix X6831 HOT 30i)",
